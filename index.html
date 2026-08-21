@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sellahts Dynasty League</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #1A2531;
+    --bg-alt: #22303F;
+    --surface: #2C3D4E;
+    --surface-raised: #38495C;
+    --line: #4C6178;
+    --ink: #FFFFFF;
+    --ink-muted: #9FB3C8;
+    --gold: #FFCE3D;
+    --gold-dim: #D9A521;
+    --red: #F0544F;
+    --blue: #55A3F5;
+    --green-win: #5FD489;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:transparent;color:var(--ink);}
+  body{
+    font-family:'IBM Plex Sans', sans-serif;
+    background:
+      linear-gradient(180deg, rgba(255,206,61,0.07), transparent 260px),
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 2px, transparent 2px, transparent 46px),
+      var(--bg);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .layout{display:flex; max-width:1400px; margin:0 auto; min-height:100vh;}
+  .app{flex:1; min-width:0; padding:18px 22px 60px;}
+
+  /* ---------- Sidebar (menu screen) ---------- */
+  .sidebar{
+    width:250px; flex:none; background:var(--bg-alt); border-right:1px solid var(--line);
+    display:flex; flex-direction:column; align-items:stretch; padding:0; gap:0;
+  }
+  .sidebar .side-mark{
+    width:auto; height:auto; background:none; clip-path:none;
+    display:block; padding:26px 24px 14px;
+    font-family:'Oswald',sans-serif; font-weight:600; font-size:12px; letter-spacing:3px; color:var(--ink-muted);
+    border-bottom:1px solid var(--line);
+  }
+  .sidebar .side-mark::after{content:'MAIN MENU'; display:block; margin-top:2px; font-size:11px; color:var(--gold); letter-spacing:3px;}
+  nav.tabs{
+    display:flex; flex-direction:column; gap:0; width:100%; margin:0; padding:0; border-bottom:none;
+  }
+  nav.tabs button{
+    position:relative; background:var(--bg-alt); border:none; border-bottom:1px solid var(--line);
+    color:var(--ink); font-family:'Teko',sans-serif;
+    font-weight:600; font-size:26px; letter-spacing:1px; text-transform:uppercase;
+    padding:20px 26px; cursor:pointer; text-align:left; margin-bottom:0; width:100%;
+    display:flex; align-items:center; gap:14px; transition:background .12s ease, color .12s ease, padding-left .12s ease;
+  }
+  nav.tabs button::before{
+    content:attr(data-index); font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:12px;
+    color:var(--ink-muted); flex:none; width:18px;
+  }
+  nav.tabs button::after{
+    content:'▸'; margin-left:auto; opacity:0; transform:translateX(-6px); transition:opacity .12s ease, transform .12s ease;
+    color:#151b12;
+  }
+  nav.tabs button:hover{background:var(--surface); padding-left:32px;}
+  nav.tabs button.active{
+    background:linear-gradient(90deg, var(--gold), var(--gold-dim));
+    color:#151b12; padding-left:32px;
+  }
+  nav.tabs button.active::before{color:#151b12; opacity:0.6;}
+  nav.tabs button.active::after{opacity:1; transform:translateX(0);}
+  .sidebar-foot{margin-top:auto; font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--ink-muted); text-align:left; letter-spacing:1.5px; padding:16px 26px; border-top:1px solid var(--line);}
+
+  /* ---------- Header (HUD bar) ---------- */
+  .header-bar{
+    display:flex; align-items:stretch; justify-content:space-between; gap:0;
+    flex-wrap:wrap; background:var(--surface); border:1px solid var(--line);
+    clip-path:polygon(0 0, 100% 0, 100% 100%, 1.5% 100%);
+    padding:16px 26px 16px 22px;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{display:none;}
+  h1.title{
+    font-family:'Teko', sans-serif; font-weight:700; letter-spacing:1px;
+    font-size:clamp(30px,4vw,42px); margin:0; line-height:0.95;
+    text-transform:uppercase; color:var(--ink);
+  }
+  .subtitle{color:var(--gold); font-size:11px; margin-top:2px; letter-spacing:1.5px; font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase;}
+
+  .conn-panel{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .conn-panel input[type=text]{
+    background:var(--bg-alt); border:1px solid var(--line); color:var(--ink);
+    padding:10px 12px; font-family:'IBM Plex Mono',monospace; font-size:12px;
+    width:220px; outline:none; clip-path:polygon(6% 0,100% 0,94% 100%,0 100%);
+  }
+  .conn-panel input[type=text]:focus{border-color:var(--gold);}
+  .btn{
+    background:var(--gold); color:#0e1116; border:none; padding:10px 20px 10px 16px;
+    font-family:'Teko',sans-serif; font-weight:600; font-size:16px; cursor:pointer;
+    letter-spacing:1px; text-transform:uppercase; transition:filter .12s ease;
+    clip-path:polygon(10% 0,100% 0,90% 100%,0 100%);
+  }
+  .btn:hover{filter:brightness(1.12);}
+  .btn.ghost{background:transparent; color:var(--ink-muted); border:1px solid var(--line);}
+  .btn.ghost:hover{color:var(--gold); border-color:var(--gold);}
+  .btn:disabled{opacity:.5; cursor:default;}
+  .auto-toggle{display:flex; align-items:center; gap:6px; font-size:10.5px; color:var(--ink-muted); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.5px;}
+  .status-msg{font-size:11px; font-family:'IBM Plex Mono',monospace; color:var(--ink-muted); width:100%; text-align:right;}
+  .status-msg.err{color:var(--red);}
+  .status-msg.ok{color:var(--green-win);}
+
+  /* ---------- Ticker ---------- */
+  .ticker-wrap{
+    margin-top:0; background:#101A24; border:1px solid var(--line); border-top:none;
+    overflow:hidden; position:relative; height:32px; display:flex; align-items:center;
+  }
+  .ticker-tag{
+    background:var(--red); color:#fff; font-family:'Teko',sans-serif; font-weight:700; font-size:14px;
+    padding:0 16px; height:100%; display:flex; align-items:center; letter-spacing:2px; flex:none; z-index:2;
+    clip-path:polygon(0 0,100% 0,88% 100%,0 100%);
+  }
+  .ticker-track{white-space:nowrap; display:inline-block; padding-left:100%; animation:ticker 38s linear infinite;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-muted);}
+  .ticker-track span.hi{color:var(--gold); font-weight:600;}
+  @keyframes ticker{ from{transform:translateX(0);} to{transform:translateX(-100%);} }
+  @media (prefers-reduced-motion: reduce){ .ticker-track{animation:none; padding-left:12px;} }
+
+  main{padding-top:26px;}
+  .section-head{
+    display:flex; align-items:center; gap:12px; margin-bottom:16px;
+  }
+  .section-head::before{
+    content:''; width:22px; height:22px; background:var(--gold);
+    clip-path:polygon(20% 0,100% 0,80% 100%,0 100%); flex:none;
+  }
+  .section-head h2{
+    font-family:'Teko',sans-serif; font-weight:600; font-size:24px; letter-spacing:1.5px;
+    text-transform:uppercase; margin:0; color:var(--ink);
+  }
+  .section-head .line{flex:1; height:1px; background:var(--line);}
+  .panel{display:none;}
+  .panel.active{display:block; animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+  .empty-state{
+    border:1px solid var(--line); background:var(--surface); padding:44px 20px; text-align:center; color:var(--ink-muted);
+    clip-path:polygon(0 0, 100% 0, 100% 94%, 98% 100%, 0 100%);
+  }
+  .empty-state b{color:var(--gold); display:block; font-family:'Teko',sans-serif; font-weight:600; font-size:22px; letter-spacing:1px; margin-bottom:6px; text-transform:uppercase;}
+
+  /* ---------- Teams ---------- */
+  .teams-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(270px,1fr)); gap:14px;}
+  .team-card{
+    background:var(--surface); border:1px solid var(--line); border-top:3px solid var(--gold-dim);
+    padding:16px; cursor:pointer; transition:border-color .15s ease;
+    clip-path:polygon(0 0, 100% 0, 100% 92%, 94% 100%, 0 100%);
+  }
+  .team-card:hover{border-top-color:var(--gold);}
+  .team-card-head{display:flex; align-items:center; gap:10px;}
+  .team-avatar{width:42px;height:42px; background:var(--surface-raised); object-fit:cover; flex:none; border:1px solid var(--line); clip-path:polygon(15% 0,100% 0,85% 100%,0 100%);}
+  .team-name{font-family:'Teko',sans-serif; font-weight:600; font-size:19px; letter-spacing:0.5px; text-transform:uppercase;}
+  .owner-name{font-size:11px; color:var(--ink-muted); font-family:'Oswald',sans-serif;}
+  .team-record{margin-top:10px; font-family:'IBM Plex Mono',monospace; font-size:13px; display:flex; gap:14px;}
+  .team-record .rec-win{color:var(--green-win); font-weight:600;}
+  .team-record .rec-pts{color:var(--ink-muted);}
+  .roster-detail{display:none; margin-top:14px; padding-top:12px; border-top:1px solid var(--line);}
+  .roster-detail.open{display:block;}
+  .pos-row{display:flex; gap:8px; font-size:12px; padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.03);}
+  .pos-badge{width:32px; flex:none; font-family:'IBM Plex Mono',monospace; color:var(--blue); font-weight:600;}
+  .plyr-name{flex:1; color:var(--ink);}
+  .plyr-team{color:var(--ink-muted); font-family:'IBM Plex Mono',monospace; font-size:11px;}
+
+  /* ---------- Matchups ---------- */
+  .week-select-row{display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
+  .week-select-row label{font-family:'Teko',sans-serif; letter-spacing:1.5px; font-size:15px;}
+  .week-select-row select{
+    background:var(--surface-raised); color:var(--ink); border:1px solid var(--line);
+    padding:8px 12px; font-family:'IBM Plex Mono',monospace; font-size:13px;
+    clip-path:polygon(6% 0,100% 0,94% 100%,0 100%);
+  }
+  .matchups-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(320px,1fr)); gap:14px;}
+  .matchup-card{
+    background:var(--surface); border:1px solid var(--line); padding:14px 18px;
+    clip-path:polygon(0 0, 100% 0, 100% 100%, 3% 100%);
+  }
+  .mu-row{display:flex; align-items:center; justify-content:space-between; padding:8px 0;}
+  .mu-team{display:flex; align-items:center; gap:8px; overflow:hidden;}
+  .mu-team img{width:26px;height:26px; flex:none; border:1px solid var(--line); clip-path:polygon(15% 0,100% 0,85% 100%,0 100%);}
+  .mu-team-name{font-size:13.5px; font-weight:600; font-family:'Oswald',sans-serif; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .mu-score{font-family:'Teko',sans-serif; font-weight:600; font-size:24px; color:var(--ink-muted);}
+  .mu-score.winning{color:var(--gold);}
+  .mu-divider{border-top:1px dashed var(--line); margin:2px 0;}
+
+  /* ---------- Players ---------- */
+  .players-controls{display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+  .players-controls input, .players-controls select{
+    background:var(--surface-raised); border:1px solid var(--line); color:var(--ink);
+    padding:9px 12px; font-family:'IBM Plex Mono',monospace; font-size:12.5px;
+    clip-path:polygon(4% 0,100% 0,96% 100%,0 100%);
+  }
+  table.data-table{width:100%; border-collapse:collapse; font-size:13px; background:var(--surface); border:1px solid var(--line);}
+  table.data-table thead th{
+    text-align:left; font-family:'Teko',sans-serif; font-weight:600; font-size:14px; letter-spacing:1px;
+    color:var(--gold); text-transform:uppercase; padding:10px 12px; border-bottom:1px solid var(--line); cursor:pointer;
+    background:var(--bg-alt);
+  }
+  table.data-table tbody td{padding:9px 12px; border-bottom:1px solid rgba(255,255,255,0.04);}
+  table.data-table tbody tr:hover{background:rgba(255,199,44,0.03);}
+  .badge{display:inline-block; padding:2px 8px; font-size:11px; font-family:'IBM Plex Mono',monospace; background:var(--surface-raised); color:var(--blue); border:1px solid var(--line); clip-path:polygon(10% 0,100% 0,90% 100%,0 100%);}
+  .badge.inj{color:var(--red);}
+
+  /* ---------- Standings ---------- */
+  .standings-table th, .standings-table td{text-align:center;}
+  .standings-table th:nth-child(2), .standings-table td:nth-child(2){text-align:left;}
+  .rank-cell{font-family:'Teko',sans-serif; font-weight:600; color:var(--gold); font-size:19px;}
+
+  /* ---------- History ---------- */
+  .history-list{display:flex; flex-direction:column; gap:10px;}
+  .history-row{
+    background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--gold); padding:14px 20px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    clip-path:polygon(0 0, 100% 0, 100% 88%, 98% 100%, 0 100%);
+  }
+  .history-season{font-family:'Teko',sans-serif; font-weight:700; font-size:26px; color:var(--gold); width:70px; flex:none;}
+  .history-champ{flex:1; min-width:180px;}
+  .history-champ .lbl{font-size:10px; color:var(--ink-muted); text-transform:uppercase; letter-spacing:1px; font-family:'IBM Plex Mono',monospace;}
+  .history-champ .val{font-size:15px; font-weight:600; font-family:'Oswald',sans-serif;}
+  .val-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .score-input{
+    background:var(--bg-alt); border:1px solid var(--line); color:var(--gold);
+    padding:5px 9px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; width:72px;
+    clip-path:polygon(10% 0,100% 0,90% 100%,0 100%); outline:none;
+  }
+  .score-input:focus{border-color:var(--gold);}
+  .score-input::placeholder{color:var(--ink-muted);}
+
+  /* ---------- Season standings toggle ---------- */
+  .season-block{display:flex; flex-direction:column; gap:0;}
+  .history-row{flex-wrap:wrap; row-gap:10px;}
+  .toggle-standings{
+    flex:none; padding:8px 14px; font-size:13px;
+  }
+  .season-standings{display:none; margin-top:8px;}
+  .season-standings.open{display:block; animation:fade .2s ease;}
+  .season-standings table{margin-top:0;}
+
+  .season-schedules{display:none; margin-top:8px;}
+  .season-schedules.open{display:block; animation:fade .2s ease;}
+  .schedule-tables{margin-top:14px;}
+  .team-schedule{display:none;}
+  .team-schedule.active{display:block;}
+  .schedule-empty{padding:26px 20px;}
+  .schedule-empty.hidden{display:none;}
+
+  .add-season-row{display:flex; gap:10px; align-items:center; margin-bottom:18px; flex-wrap:wrap;}
+  .add-season-row input{width:160px;}
+  .season-year-input{
+    background:var(--bg-alt); border:1px solid var(--line); color:var(--gold);
+    font-family:'Teko',sans-serif; font-weight:700; font-size:26px; width:90px; text-align:left;
+    padding:2px 6px; clip-path:none; flex:none;
+  }
+  .remove-season{
+    margin-left:auto; background:transparent; border:1px solid var(--red); color:var(--red);
+    font-family:'Oswald',sans-serif; font-weight:600; font-size:11px; letter-spacing:0.5px; text-transform:uppercase;
+    padding:8px 12px; cursor:pointer; clip-path:polygon(10% 0,100% 0,90% 100%,0 100%);
+  }
+  .remove-season:hover{background:var(--red); color:#fff;}
+  .save-indicator{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-muted);
+    letter-spacing:0.5px; text-transform:uppercase; opacity:0; transition:opacity .3s ease;
+  }
+  .save-indicator.show{opacity:1;}
+  .trophy{font-size:18px;}
+
+  footer.note{margin-top:40px; padding-top:16px; border-top:1px solid var(--line); color:var(--ink-muted); font-size:11px; font-family:'IBM Plex Mono',monospace; letter-spacing:0.3px;}
+  .loader{color:var(--gold); font-family:'Teko',sans-serif; font-size:16px; letter-spacing:1px; padding:20px 0; text-transform:uppercase;}
+
+  /* ---------- Rules ---------- */
+  .rules-content{display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:14px;}
+  .rule-section{
+    background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--gold); padding:16px 20px;
+    clip-path:polygon(0 0, 100% 0, 100% 92%, 96% 100%, 0 100%);
+  }
+  .rule-section h3{
+    margin:0 0 10px; font-family:'Teko',sans-serif; font-weight:600; font-size:20px; letter-spacing:1px;
+    text-transform:uppercase; color:var(--gold);
+  }
+  .rule-section ul{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:8px;}
+  .rule-section li{font-size:13.5px; line-height:1.5; color:var(--ink-muted);}
+  .rule-section li::marker{color:var(--gold);}
+  .rules-textarea{
+    width:100%; resize:vertical; line-height:1.5; font-size:13.5px;
+    background:transparent; border:none; padding:0; color:var(--ink-muted); font-family:'IBM Plex Sans',sans-serif;
+  }
+  .rules-textarea:focus{outline:1px solid var(--gold); background:var(--bg-alt);}
+
+  /* ---------- History sub-tabs ---------- */
+  .subtabs{display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--line); flex-wrap:wrap;}
+  .subtabs button{
+    background:none; border:none; color:var(--ink-muted); font-family:'Oswald',sans-serif; font-weight:600;
+    font-size:13px; letter-spacing:0.5px; text-transform:uppercase; padding:9px 14px; cursor:pointer;
+    border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .12s ease, border-color .12s ease;
+  }
+  .subtabs button:hover{color:var(--ink);}
+  .subtabs button.active{color:var(--gold); border-bottom-color:var(--gold);}
+  .subpanel{display:none;}
+  .subpanel.active{display:block; animation:fade .2s ease;}
+
+  .year-group{margin-bottom:18px;}
+  .year-group h3{
+    font-family:'Teko',sans-serif; font-weight:600; font-size:22px; letter-spacing:1px; color:var(--gold);
+    margin:0 0 10px; padding-bottom:6px; border-bottom:1px solid var(--line);
+  }
+  .year-group ul{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:8px;}
+  .year-group li{font-size:13.5px; line-height:1.5; color:var(--ink-muted);}
+  .year-group li::marker{color:var(--gold);}
+
+  /* ---------- Drafts by Year ---------- */
+  .draft-block{margin-bottom:26px;}
+  .draft-head{display:flex; align-items:center; gap:12px; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid var(--line); flex-wrap:wrap;}
+  .draft-year-input{width:90px; flex:none;}
+  .draft-label{font-family:'Teko',sans-serif; font-weight:600; font-size:22px; letter-spacing:1px; color:var(--gold); text-transform:uppercase;}
+  .remove-draft{
+    margin-left:auto; background:transparent; border:1px solid var(--red); color:var(--red);
+    font-family:'Oswald',sans-serif; font-weight:600; font-size:11px; letter-spacing:0.5px; text-transform:uppercase;
+    padding:8px 12px; cursor:pointer; clip-path:polygon(10% 0,100% 0,90% 100%,0 100%);
+  }
+  .remove-draft:hover{background:var(--red); color:#fff;}
+  .round-label{
+    font-family:'Teko',sans-serif; font-weight:600; font-size:17px; letter-spacing:1px; color:var(--ink-muted);
+    text-transform:uppercase; margin:14px 0 6px;
+  }
+  .score-select{
+    background:var(--bg-alt); border:1px solid var(--line); color:var(--ink);
+    padding:8px 9px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; width:100%;
+    clip-path:polygon(4% 0,100% 0,96% 100%,0 100%); outline:none;
+  }
+  .score-select:focus{border-color:var(--gold);}
+
+  /* ---------- Trade Archives ---------- */
+  .trade-rows{display:flex; flex-direction:column; gap:8px; margin-bottom:10px;}
+  .trade-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .trade-row select{width:110px; flex:none;}
+  .trade-row input[type=text]{flex:1; min-width:220px;}
+  .trade-arrow{color:var(--ink-muted); font-family:'IBM Plex Mono',monospace; flex:none;}
+  .remove-trade{
+    flex:none; background:transparent; border:1px solid var(--red); color:var(--red);
+    font-family:'IBM Plex Mono',monospace; font-size:12px; width:28px; height:28px; line-height:1;
+    cursor:pointer; clip-path:polygon(10% 0,100% 0,90% 100%,0 100%);
+  }
+  .remove-trade:hover{background:var(--red); color:#fff;}
+  .remove-trade-year{
+    margin-left:auto; background:transparent; border:1px solid var(--red); color:var(--red);
+    font-family:'Oswald',sans-serif; font-weight:600; font-size:11px; letter-spacing:0.5px; text-transform:uppercase;
+    padding:8px 12px; cursor:pointer; clip-path:polygon(10% 0,100% 0,90% 100%,0 100%);
+  }
+  .remove-trade-year:hover{background:var(--red); color:#fff;}
+  .add-trade-btn{font-size:12px; padding:7px 12px; margin-bottom:20px;}
+
+  @media (max-width: 760px){
+    .layout{flex-direction:column;}
+    .sidebar{width:100%; flex-direction:row; padding:0; overflow-x:auto;}
+    .sidebar .side-mark{display:none;}
+    nav.tabs{flex-direction:row; width:auto;}
+    nav.tabs button{padding:14px 16px; white-space:nowrap; border-bottom:none; border-right:1px solid var(--line);}
+    nav.tabs button:hover, nav.tabs button.active{padding-left:16px;}
+    nav.tabs button::before{display:none;}
+    nav.tabs button::after{display:none;}
+    .sidebar-foot{display:none;}
+    .header-bar{clip-path:none;}
+    .status-msg{text-align:left;}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <div class="sidebar">
+    <div class="side-mark">SDL</div>
+    <nav class="tabs">
+      <button data-tab="rules" data-index="01" class="active">Rules</button>
+      <button data-tab="teams" data-index="02">Teams</button>
+      <button data-tab="matchups" data-index="03">Matchups</button>
+      <button data-tab="players" data-index="04">Players</button>
+      <button data-tab="standings" data-index="05">Standings</button>
+      <button data-tab="history" data-index="06">History</button>
+    </nav>
+    <div class="sidebar-foot">DYNASTY<br>MODE</div>
+  </div>
+
+  <div class="app">
+
+  <div class="header-bar">
+    <div class="brand">
+      <div>
+        <h1 class="title" id="leagueTitle">Sellahts Dynasty League</h1>
+        <div class="subtitle" id="leagueSubtitle">connect a sleeper league to begin</div>
+      </div>
+    </div>
+    <div class="conn-panel">
+      <input type="text" id="leagueIdInput" placeholder="Sleeper League ID">
+      <button class="btn" id="connectBtn">Connect</button>
+      <button class="btn ghost" id="refreshBtn" disabled>Refresh</button>
+      <label class="auto-toggle"><input type="checkbox" id="autoRefreshToggle" checked> auto-refresh</label>
+      <span class="save-indicator" id="saveIndicator">Saved ✓</span>
+      <div class="status-msg" id="statusMsg"></div>
+    </div>
+  </div>
+
+  <div class="ticker-wrap" id="tickerWrap" style="display:none;">
+    <div class="ticker-tag">LIVE</div>
+    <div class="ticker-track" id="tickerTrack">&nbsp;</div>
+  </div>
+
+  <main>
+    <section class="panel active" id="panel-rules">
+      <div class="section-head"><h2>League Rules</h2><div class="line"></div></div>
+      <div class="rules-content">
+        <div class="rule-section">
+          <h3>Roster &amp; Lineup</h3>
+          <textarea class="score-input rules-textarea" data-key="rules|roster" rows="4">Edit this list to match your league's actual roster settings (starters, bench, IR slots).
+Lineups lock at the first kickoff of each week.</textarea>
+        </div>
+        <div class="rule-section">
+          <h3>Scoring</h3>
+          <textarea class="score-input rules-textarea" data-key="rules|scoring" rows="4">PPR / Half-PPR / Standard — set your format here.
+Note any custom scoring (TE premium, 6pt passing TDs, etc).</textarea>
+        </div>
+        <div class="rule-section">
+          <h3>Trades</h3>
+          <textarea class="score-input rules-textarea" data-key="rules|trades" rows="4">State your trade deadline and review/veto process.
+Note any collusion or fairness policy.</textarea>
+        </div>
+        <div class="rule-section">
+          <h3>Waivers &amp; Free Agency</h3>
+          <textarea class="score-input rules-textarea" data-key="rules|waivers" rows="4">FAAB budget or waiver priority order.
+Waiver processing day/time.</textarea>
+        </div>
+        <div class="rule-section">
+          <h3>Rookie Draft</h3>
+          <textarea class="score-input rules-textarea" data-key="rules|draft" rows="4">Draft order method (reverse standings, lottery, etc).
+Number of rounds and pick-time clock.</textarea>
+        </div>
+        <div class="rule-section">
+          <h3>Playoffs &amp; Payouts</h3>
+          <textarea class="score-input rules-textarea" data-key="rules|playoffs" rows="4">Playoff bracket size and seeding rules.
+Buy-in amount and payout structure.</textarea>
+        </div>
+        <div class="rule-section">
+          <h3>Conduct</h3>
+          <textarea class="score-input rules-textarea" data-key="rules|conduct" rows="4">Expectations for communication, activity, and lineup-setting.
+Consequences for owner inactivity or league abandonment.</textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-teams">
+      <div class="section-head"><h2>Team Rosters</h2><div class="line"></div></div>
+      <div class="empty-state" id="teamsEmpty"><b>No league connected</b>Enter your Sleeper League ID above and hit Connect to load rosters.</div>
+      <div class="teams-grid" id="teamsGrid"></div>
+    </section>
+
+    <section class="panel" id="panel-matchups">
+      <div class="section-head"><h2>Weekly Matchups</h2><div class="line"></div></div>
+      <div class="empty-state" id="matchupsEmpty"><b>No league connected</b>Weekly head-to-head matchups will show up here.</div>
+      <div id="matchupsBody" style="display:none;">
+        <div class="week-select-row">
+          <label for="weekSelect">WEEK</label>
+          <select id="weekSelect"></select>
+        </div>
+        <div class="matchups-grid" id="matchupsGrid"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-players">
+      <div class="section-head"><h2>Player Roster Data</h2><div class="line"></div></div>
+      <div class="empty-state" id="playersEmpty"><b>No league connected</b>Rostered player info will show up here.</div>
+      <div id="playersBody" style="display:none;">
+        <div class="players-controls">
+          <input type="text" id="playerSearch" placeholder="Search players...">
+          <select id="posFilter"><option value="">All positions</option></select>
+          <select id="teamFilter"><option value="">All teams</option></select>
+        </div>
+        <table class="data-table">
+          <thead><tr>
+            <th>#</th><th data-sort="name">Player</th><th data-sort="pos">Pos</th><th data-sort="nfl">NFL</th>
+            <th data-sort="age">Age</th><th data-sort="status">Status</th><th data-sort="fteam">Roster</th><th data-sort="points">Points</th>
+          </tr></thead>
+          <tbody id="playersTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-standings">
+      <div class="section-head"><h2>League Standings</h2><div class="line"></div></div>
+      <div class="empty-state" id="standingsEmpty"><b>No league connected</b>Full league standings will show up here.</div>
+      <table class="data-table standings-table" id="standingsTable" style="display:none;">
+        <thead><tr><th>#</th><th>Team</th><th>W</th><th>L</th><th>T</th><th>PF</th><th>PA</th><th>Playoff Odds</th></tr></thead>
+        <tbody id="standingsTbody"></tbody>
+      </table>
+    </section>
+
+    <section class="panel" id="panel-history">
+      <div class="section-head"><h2>Dynasty History</h2><div class="line"></div></div>
+
+      <nav class="subtabs">
+        <button data-subtab="seasons" class="active">Past Seasons</button>
+        <button data-subtab="h2h">All-Time H2H</button>
+        <button data-subtab="alltime">All-Time Standings</button>
+        <button data-subtab="trades">Trade Archives</button>
+        <button data-subtab="drafts">Draft Archives</button>
+        <button data-subtab="performances">Top Performances</button>
+      </nav>
+
+      <div class="subpanel active" id="sub-seasons">
+        <div class="add-season-row">
+          <input type="text" id="newSeasonYear" class="score-input" placeholder="Year (e.g. 2025)">
+          <button class="btn" id="addSeasonBtn">+ Add Season</button>
+        </div>
+        <div class="history-list" id="seasonsContainer"></div>
+        <div class="empty-state" id="seasonsEmpty" style="display:none;"><b>No seasons yet</b>Enter a year above and hit "+ Add Season" to start building your dynasty's history.</div>
+      </div>
+
+      <div class="subpanel" id="sub-h2h">
+        <div class="empty-state" style="margin-bottom:14px; padding:16px; text-align:left;"><b style="margin-bottom:0;">Auto-calculated</b>This table pulls wins, losses, last meeting, and scores straight from the Team Schedules entered in the Past Seasons tab — no need to edit it directly.</div>
+        <div class="week-select-row">
+          <label for="h2hTeamSelect">TEAM</label>
+          <select id="h2hTeamSelect">
+            <option value="">All Teams</option>
+            <option value="Team A">Team A</option>
+            <option value="Team B">Team B</option>
+            <option value="Team C">Team C</option>
+            <option value="Team D">Team D</option>
+            <option value="Team E">Team E</option>
+            <option value="Team F">Team F</option>
+            <option value="Team G">Team G</option>
+            <option value="Team H">Team H</option>
+            <option value="Team I">Team I</option>
+            <option value="Team J">Team J</option>
+          </select>
+        </div>
+        <table class="data-table" id="h2hTable">
+          <thead><tr><th>Matchup</th><th>All-Time Record</th><th>Last Meeting Year</th><th>Score (Team 1)</th><th>Score (Team 2)</th></tr></thead>
+          <tbody>
+            <tr data-teams="Team A|Team B"><td>Team A vs Team B</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team C"><td>Team A vs Team C</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team D"><td>Team A vs Team D</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team E"><td>Team A vs Team E</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team F"><td>Team A vs Team F</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team G"><td>Team A vs Team G</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team H"><td>Team A vs Team H</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team I"><td>Team A vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team J"><td>Team A vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team C"><td>Team B vs Team C</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team D"><td>Team B vs Team D</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team E"><td>Team B vs Team E</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team F"><td>Team B vs Team F</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team G"><td>Team B vs Team G</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team H"><td>Team B vs Team H</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team I"><td>Team B vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team J"><td>Team B vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team C|Team D"><td>Team C vs Team D</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team C|Team E"><td>Team C vs Team E</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team C|Team F"><td>Team C vs Team F</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team C|Team G"><td>Team C vs Team G</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team C|Team H"><td>Team C vs Team H</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team C|Team I"><td>Team C vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team C|Team J"><td>Team C vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team D|Team E"><td>Team D vs Team E</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team D|Team F"><td>Team D vs Team F</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team D|Team G"><td>Team D vs Team G</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team D|Team H"><td>Team D vs Team H</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team D|Team I"><td>Team D vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team D|Team J"><td>Team D vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team E|Team F"><td>Team E vs Team F</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team E|Team G"><td>Team E vs Team G</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team E|Team H"><td>Team E vs Team H</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team E|Team I"><td>Team E vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team E|Team J"><td>Team E vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team F|Team G"><td>Team F vs Team G</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team F|Team H"><td>Team F vs Team H</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team F|Team I"><td>Team F vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team F|Team J"><td>Team F vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team G|Team H"><td>Team G vs Team H</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team G|Team I"><td>Team G vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team G|Team J"><td>Team G vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team H|Team I"><td>Team H vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team H|Team J"><td>Team H vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team I|Team J"><td>Team I vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+          </tbody>
+        </table>
+        <div class="empty-state" id="h2hEmpty" style="display:none;"><b>No matchups yet</b>This team has no recorded meetings.</div>
+      </div>
+
+      <div class="subpanel" id="sub-alltime">
+        <div class="empty-state" style="margin-bottom:14px; padding:16px; text-align:left;"><b style="margin-bottom:0;">Auto-calculated</b>This table updates automatically from the "All-Time H2H" record and score fields — no need to edit it directly.</div>
+        <table class="data-table standings-table" id="alltimeStandingsTable">
+          <thead><tr><th>#</th><th>Team</th><th>W</th><th>L</th><th>Win %</th><th>PF</th><th>PA</th></tr></thead>
+          <tbody id="alltimeStandingsTbody"></tbody>
+        </table>
+      </div>
+
+      <div class="subpanel" id="sub-trades">
+        <div class="add-season-row">
+          <input type="text" id="newTradeYear" class="score-input" placeholder="Year (e.g. 2025)">
+          <button class="btn" id="addTradeYearBtn">+ Add Year</button>
+        </div>
+        <div class="week-select-row">
+          <label for="tradeTeamSelect">FILTER BY TEAM</label>
+          <select id="tradeTeamSelect">
+            <option value="">All Teams</option>
+            <option value="Team A">Team A</option>
+            <option value="Team B">Team B</option>
+            <option value="Team C">Team C</option>
+            <option value="Team D">Team D</option>
+            <option value="Team E">Team E</option>
+            <option value="Team F">Team F</option>
+            <option value="Team G">Team G</option>
+            <option value="Team H">Team H</option>
+            <option value="Team I">Team I</option>
+            <option value="Team J">Team J</option>
+          </select>
+        </div>
+        <div id="tradesContainer"></div>
+        <div class="empty-state" id="tradesYearsEmpty" style="display:none;"><b>No trade years yet</b>Enter a year above and hit "+ Add Year" to start logging trades.</div>
+        <div class="empty-state" id="tradesEmpty" style="display:none;"><b>No trades yet</b>This team has no recorded trades.</div>
+      </div>
+
+      <div class="subpanel" id="sub-drafts">
+        <div class="add-season-row">
+          <input type="text" id="newDraftYear" class="score-input" placeholder="Year (e.g. 2025)">
+          <button class="btn" id="addDraftBtn">+ Add Draft</button>
+        </div>
+        <div id="draftsContainer"></div>
+        <div class="empty-state" id="draftsEmpty" style="display:none;"><b>No drafts yet</b>Enter a year above and hit "+ Add Draft" to log a rookie draft class.</div>
+      </div>
+
+      <div class="subpanel" id="sub-performances">
+        <table class="data-table">
+          <thead><tr><th>Rank</th><th>Player</th><th>Team</th><th>Points</th><th>Week / Season</th></tr></thead>
+          <tbody>
+            <tr><td class="rank-cell">1</td><td><input type="text" class="score-input" data-key="perf|1|player" placeholder="Player name"></td><td><input type="text" class="score-input" data-key="perf|1|team" placeholder="Roster name"></td><td><input type="text" class="score-input" data-key="perf|1|points" placeholder="0.0"></td><td><input type="text" class="score-input" data-key="perf|1|week" placeholder="Week X, 20XX"></td></tr>
+            <tr><td class="rank-cell">2</td><td><input type="text" class="score-input" data-key="perf|2|player" placeholder="Player name"></td><td><input type="text" class="score-input" data-key="perf|2|team" placeholder="Roster name"></td><td><input type="text" class="score-input" data-key="perf|2|points" placeholder="0.0"></td><td><input type="text" class="score-input" data-key="perf|2|week" placeholder="Week X, 20XX"></td></tr>
+            <tr><td class="rank-cell">3</td><td><input type="text" class="score-input" data-key="perf|3|player" placeholder="Player name"></td><td><input type="text" class="score-input" data-key="perf|3|team" placeholder="Roster name"></td><td><input type="text" class="score-input" data-key="perf|3|points" placeholder="0.0"></td><td><input type="text" class="score-input" data-key="perf|3|week" placeholder="Week X, 20XX"></td></tr>
+            <tr><td class="rank-cell">4</td><td><input type="text" class="score-input" data-key="perf|4|player" placeholder="Player name"></td><td><input type="text" class="score-input" data-key="perf|4|team" placeholder="Roster name"></td><td><input type="text" class="score-input" data-key="perf|4|points" placeholder="0.0"></td><td><input type="text" class="score-input" data-key="perf|4|week" placeholder="Week X, 20XX"></td></tr>
+            <tr><td class="rank-cell">5</td><td><input type="text" class="score-input" data-key="perf|5|player" placeholder="Player name"></td><td><input type="text" class="score-input" data-key="perf|5|team" placeholder="Roster name"></td><td><input type="text" class="score-input" data-key="perf|5|points" placeholder="0.0"></td><td><input type="text" class="score-input" data-key="perf|5|week" placeholder="Week X, 20XX"></td></tr>
+            <tr><td class="rank-cell">6</td><td><input type="text" class="score-input" data-key="perf|6|player" placeholder="Player name"></td><td><input type="text" class="score-input" data-key="perf|6|team" placeholder="Roster name"></td><td><input type="text" class="score-input" data-key="perf|6|points" placeholder="0.0"></td><td><input type="text" class="score-input" data-key="perf|6|week" placeholder="Week X, 20XX"></td></tr>
+            <tr><td class="rank-cell">7</td><td><input type="text" class="score-input" data-key="perf|7|player" placeholder="Player name"></td><td><input type="text" class="score-input" data-key="perf|7|team" placeholder="Roster name"></td><td><input type="text" class="score-input" data-key="perf|7|points" placeholder="0.0"></td><td><input type="text" class="score-input" data-key="perf|7|week" placeholder="Week X, 20XX"></td></tr>
+            <tr><td class="rank-cell">8</td><td><input type="text" class="score-input" data-key="perf|8|player" placeholder="Player name"></td><td><input type="text" class="score-input" data-key="perf|8|team" placeholder="Roster name"></td><td><input type="text" class="score-input" data-key="perf|8|points" placeholder="0.0"></td><td><input type="text" class="score-input" data-key="perf|8|week" placeholder="Week X, 20XX"></td></tr>
+            <tr><td class="rank-cell">9</td><td><input type="text" class="score-input" data-key="perf|9|player" placeholder="Player name"></td><td><input type="text" class="score-input" data-key="perf|9|team" placeholder="Roster name"></td><td><input type="text" class="score-input" data-key="perf|9|points" placeholder="0.0"></td><td><input type="text" class="score-input" data-key="perf|9|week" placeholder="Week X, 20XX"></td></tr>
+            <tr><td class="rank-cell">10</td><td><input type="text" class="score-input" data-key="perf|10|player" placeholder="Player name"></td><td><input type="text" class="score-input" data-key="perf|10|team" placeholder="Roster name"></td><td><input type="text" class="score-input" data-key="perf|10|points" placeholder="0.0"></td><td><input type="text" class="score-input" data-key="perf|10|week" placeholder="Week X, 20XX"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="note">Data pulled live from the Sleeper API. Sellahts Dynasty League is not affiliated with Sleeper.</footer>
+  </div>
+</div>
+
+<script>
+(function(){
+  const SLEEPER = "https://api.sleeper.app/v1";
+  let state = {
+    leagueId: null,
+    league: null,
+    rosters: [],
+    users: [],
+    playersDict: null,
+    playerPoints: {},
+    playoffOdds: {},
+    nflState: null,
+    currentWeek: 1,
+    autoRefresh: true,
+    timer: null
+  };
+
+  const el = id => document.getElementById(id);
+  const statusMsg = el('statusMsg');
+
+  function setStatus(text, kind){
+    statusMsg.textContent = text || '';
+    statusMsg.className = 'status-msg' + (kind ? ' '+kind : '');
+  }
+
+  // ---------- Tabs ----------
+  document.querySelectorAll('nav.tabs button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      el('panel-'+btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.subtabs button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const subtabs = btn.closest('.subtabs');
+      const container = subtabs.parentElement;
+      subtabs.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      container.querySelectorAll('.subpanel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      el('sub-'+btn.dataset.subtab).classList.add('active');
+    });
+  });
+
+  // ---------- Persistent site data (seasons, H2H, performances, etc.) ----------
+  const TEAM_LIST = ['Team A','Team B','Team C','Team D','Team E','Team F','Team G','Team H','Team I','Team J'];
+  const WEEK_LIST = [
+    {key:'w1',label:'1'},{key:'w2',label:'2'},{key:'w3',label:'3'},{key:'w4',label:'4'},
+    {key:'w5',label:'5'},{key:'w6',label:'6'},{key:'w7',label:'7'},{key:'w8',label:'8'},
+    {key:'w9',label:'9'},{key:'w10',label:'10'},{key:'w11',label:'11'},{key:'w12',label:'12'},
+    {key:'w13',label:'13'},{key:'w14',label:'14'},
+    {key:'r1',label:'Round 1'},{key:'r2',label:'Round 2'},{key:'champ',label:'Championship'}
+  ];
+
+  let seasonIds = [];
+  let draftIds = [];
+  let tradeYearIds = [];
+  let fieldValues = {};
+  let saveTimer = null;
+
+  function fv(key, fallback){ return fieldValues[key] !== undefined ? fieldValues[key] : (fallback || ''); }
+
+  function buildSeasonBlock(id){
+    const standingsRows = TEAM_LIST.map((team,i)=>`
+                <tr><td class="rank-cell">${i+1}</td><td>${team}</td>
+                  <td><input type="text" class="score-input" data-key="season|${id}|standings|${team}|w" placeholder="0"></td>
+                  <td><input type="text" class="score-input" data-key="season|${id}|standings|${team}|l" placeholder="0"></td>
+                  <td><input type="text" class="score-input" data-key="season|${id}|standings|${team}|t" placeholder="0"></td>
+                  <td><input type="text" class="score-input" data-key="season|${id}|standings|${team}|pf" placeholder="0.00"></td>
+                  <td><input type="text" class="score-input" data-key="season|${id}|standings|${team}|pa" placeholder="0.00"></td>
+                </tr>`).join('');
+
+    const teamOptions = TEAM_LIST.map(t=>`<option value="${t}">${t}</option>`).join('');
+
+    const teamTables = TEAM_LIST.map(team=>{
+      const opponentOptions = TEAM_LIST.filter(t=> t !== team).map(t=>`<option value="${t}">${t}</option>`).join('');
+      const rows = WEEK_LIST.map(w=>`
+                    <tr><td>${w.label}</td>
+                      <td><select class="score-select sched-input" data-key="season|${id}|schedule|${team}|${w.key}|opponent"><option value="">Opponent</option>${opponentOptions}</select></td>
+                      <td><input type="text" class="score-input sched-input" data-key="season|${id}|schedule|${team}|${w.key}|pf" placeholder="0.0"></td>
+                      <td><input type="text" class="score-input sched-input" data-key="season|${id}|schedule|${team}|${w.key}|pa" placeholder="0.0"></td>
+                      <td><select class="score-select sched-input" data-key="season|${id}|schedule|${team}|${w.key}|result"><option value="">&ndash;</option><option value="W">W</option><option value="L">L</option></select></td>
+                    </tr>`).join('');
+      return `
+              <div class="team-schedule" data-team="${team}">
+                <table class="data-table">
+                  <thead><tr><th>Week</th><th>Opponent</th><th>PF</th><th>PA</th><th>Result</th></tr></thead>
+                  <tbody>${rows}
+                  </tbody>
+                </table>
+              </div>`;
+    }).join('');
+
+    return `
+          <div class="season-block" data-season-id="${id}">
+            <div class="history-row">
+              <input type="text" class="score-input season-year-input" data-key="season|${id}|year" placeholder="20XX">
+              <div class="history-champ">
+                <div class="lbl">Champion</div>
+                <div class="val-row">
+                  <input type="text" class="score-input" data-key="season|${id}|championName" placeholder="🏆 Champion name">
+                  <input type="text" class="score-input" data-key="season|${id}|championScore" placeholder="Score">
+                </div>
+              </div>
+              <div class="history-champ">
+                <div class="lbl">Runner-up</div>
+                <div class="val-row">
+                  <input type="text" class="score-input" data-key="season|${id}|runnerupName" placeholder="Runner-up name">
+                  <input type="text" class="score-input" data-key="season|${id}|runnerupScore" placeholder="Score">
+                </div>
+              </div>
+              <button class="btn ghost toggle-standings">Season Standings ▾</button>
+              <button class="btn ghost toggle-schedules">Team Schedules ▾</button>
+              <button class="remove-season" data-season-id="${id}">Remove</button>
+            </div>
+            <div class="season-standings">
+              <table class="data-table standings-table">
+                <thead><tr><th>#</th><th>Team</th><th>W</th><th>L</th><th>T</th><th>PF</th><th>PA</th></tr></thead>
+                <tbody>${standingsRows}
+                </tbody>
+              </table>
+            </div>
+            <div class="season-schedules">
+              <div class="week-select-row">
+                <label>TEAM</label>
+                <select class="schedule-team-select">
+                  <option value="">Select a team</option>
+                  ${teamOptions}
+                </select>
+              </div>
+              <div class="empty-state schedule-empty"><b>No team selected</b>Choose a team above to enter its schedule for this season.</div>
+              <div class="schedule-tables">${teamTables}
+              </div>
+            </div>
+          </div>`;
+  }
+
+  function renderSeasons(){
+    const container = el('seasonsContainer');
+    if(!container) return;
+    container.innerHTML = seasonIds.map(buildSeasonBlock).join('');
+    el('seasonsEmpty').style.display = seasonIds.length ? 'none' : 'block';
+    restoreFieldValues(container);
+  }
+
+  function restoreFieldValues(scope){
+    (scope || document).querySelectorAll('[data-key]').forEach(elm=>{
+      const v = fieldValues[elm.dataset.key];
+      if(v !== undefined) elm.value = v;
+    });
+  }
+
+  function scheduleSave(){
+    if(saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>{
+      try{
+        localStorage.setItem('site-data', JSON.stringify({seasonIds, draftIds, tradeYearIds, fieldValues}));
+        flashSaveIndicator();
+      }catch(e){ console.error('save failed', e); }
+    }, 700);
+  }
+
+  function flashSaveIndicator(){
+    const ind = el('saveIndicator');
+    if(!ind) return;
+    ind.classList.add('show');
+    clearTimeout(ind._hideTimer);
+    ind._hideTimer = setTimeout(()=> ind.classList.remove('show'), 1500);
+  }
+
+  async function loadSiteData(){
+    try{
+      const raw = localStorage.getItem('site-data');
+      if(raw){
+        const parsed = JSON.parse(raw);
+        seasonIds = parsed.seasonIds || [];
+        draftIds = parsed.draftIds || ['draft-1','draft-2'];
+        tradeYearIds = parsed.tradeYearIds || [];
+        fieldValues = parsed.fieldValues || {};
+      }else{
+        seasonIds = ['season-1','season-2','season-3'];
+        draftIds = ['draft-1','draft-2'];
+        tradeYearIds = [];
+        fieldValues = {};
+      }
+    }catch(e){
+      seasonIds = ['season-1','season-2','season-3'];
+      draftIds = ['draft-1','draft-2'];
+      tradeYearIds = [];
+      fieldValues = {};
+    }
+    renderSeasons();
+    renderDrafts();
+    renderTradeYears();
+    restoreFieldValues();
+    recalcFromSchedules();
+  }
+
+  const DRAFT_ROUNDS = 3;
+
+  function buildDraftBlock(id){
+    const teamOptions = TEAM_LIST.map(t=>`<option value="${t}">${t}</option>`).join('');
+    let roundsHtml = '';
+    for(let r=1; r<=DRAFT_ROUNDS; r++){
+      let picksHtml = '';
+      for(let p=1; p<=TEAM_LIST.length; p++){
+        const pickKey = `r${r}p${p}`;
+        const pickLabel = `${r}.${String(p).padStart(2,'0')}`;
+        picksHtml += `
+                <tr><td>${pickLabel}</td>
+                  <td><select class="score-select" data-key="draft|${id}|${pickKey}|team"><option value="">Team</option>${teamOptions}</select></td>
+                  <td><input type="text" class="score-input" data-key="draft|${id}|${pickKey}|player" placeholder="Player"></td>
+                  <td><input type="text" class="score-input" data-key="draft|${id}|${pickKey}|position" placeholder="Pos"></td>
+                  <td><input type="text" class="score-input" data-key="draft|${id}|${pickKey}|school" placeholder="School"></td>
+                </tr>`;
+      }
+      roundsHtml += `
+            <div class="round-label">Round ${r}</div>
+            <table class="data-table">
+              <thead><tr><th>Pick</th><th>Team</th><th>Player</th><th>Position</th><th>School</th></tr></thead>
+              <tbody>${picksHtml}
+              </tbody>
+            </table>`;
+    }
+    return `
+          <div class="draft-block" data-draft-id="${id}">
+            <div class="draft-head">
+              <input type="text" class="score-input draft-year-input" data-key="draft|${id}|year" placeholder="20XX">
+              <span class="draft-label">Rookie Draft</span>
+              <button class="remove-draft" data-draft-id="${id}">Remove</button>
+            </div>
+            ${roundsHtml}
+          </div>`;
+  }
+
+  function renderDrafts(){
+    const container = el('draftsContainer');
+    if(!container) return;
+    container.innerHTML = draftIds.map(buildDraftBlock).join('');
+    el('draftsEmpty').style.display = draftIds.length ? 'none' : 'block';
+    restoreFieldValues(container);
+  }
+
+  // ---------- Trade Archives ----------
+  function buildTradeRow(yid, tid){
+    const teamOptions = TEAM_LIST.map(t=>`<option value="${t}">${t}</option>`).join('');
+    return `
+              <div class="trade-row" data-trade-id="${tid}">
+                <select class="score-select trade-team-select" data-key="trade|${yid}|${tid}|team1"><option value="">Team</option>${teamOptions}</select>
+                <span class="trade-arrow">&harr;</span>
+                <select class="score-select trade-team-select" data-key="trade|${yid}|${tid}|team2"><option value="">Team</option>${teamOptions}</select>
+                <input type="text" class="score-input" data-key="trade|${yid}|${tid}|desc" placeholder="Trade details (players, picks, etc.)">
+                <button class="remove-trade" data-year-id="${yid}" data-trade-id="${tid}">&times;</button>
+              </div>`;
+  }
+
+  function buildTradeYearBlock(yid){
+    let tradeIds = [];
+    try{ tradeIds = JSON.parse(fv(`trade|${yid}|list`, '[]')); }catch(e){ tradeIds = []; }
+    const rows = tradeIds.map(tid=>buildTradeRow(yid, tid)).join('') || '<div class="empty-state" style="padding:16px;"><b style="margin-bottom:0;">No trades logged</b>Click "+ Add Trade" to log one for this year.</div>';
+    return `
+          <div class="year-group trade-year-block" data-year-id="${yid}">
+            <div class="draft-head">
+              <input type="text" class="score-input draft-year-input" data-key="trade|${yid}|year" placeholder="20XX">
+              <span class="draft-label">Trades</span>
+              <button class="remove-trade-year" data-year-id="${yid}">Remove Year</button>
+            </div>
+            <div class="trade-rows" data-year-id="${yid}">${rows}</div>
+            <button class="btn ghost add-trade-btn" data-year-id="${yid}">+ Add Trade</button>
+          </div>`;
+  }
+
+  function renderTradeYears(){
+    const container = el('tradesContainer');
+    if(!container) return;
+    container.innerHTML = tradeYearIds.map(buildTradeYearBlock).join('');
+    el('tradesYearsEmpty').style.display = tradeYearIds.length ? 'none' : 'block';
+    restoreFieldValues(container);
+    applyTradeFilter();
+  }
+
+  el('addSeasonBtn').addEventListener('click', ()=>{
+    const yearInput = el('newSeasonYear');
+    const year = yearInput.value.trim();
+    const id = 's' + Date.now();
+    seasonIds.push(id);
+    if(year) fieldValues[`season|${id}|year`] = year;
+    yearInput.value = '';
+    renderSeasons();
+    scheduleSave();
+  });
+
+  el('addDraftBtn').addEventListener('click', ()=>{
+    const yearInput = el('newDraftYear');
+    const year = yearInput.value.trim();
+    const id = 'd' + Date.now();
+    draftIds.push(id);
+    if(year) fieldValues[`draft|${id}|year`] = year;
+    yearInput.value = '';
+    renderDrafts();
+    scheduleSave();
+  });
+
+  el('addTradeYearBtn').addEventListener('click', ()=>{
+    const yearInput = el('newTradeYear');
+    const year = yearInput.value.trim();
+    const yid = 'ty' + Date.now();
+    tradeYearIds.push(yid);
+    fieldValues[`trade|${yid}|list`] = '[]';
+    if(year) fieldValues[`trade|${yid}|year`] = year;
+    yearInput.value = '';
+    renderTradeYears();
+    scheduleSave();
+  });
+
+  // ---------- Delegated events: field edits, season toggles/removal ----------
+  document.addEventListener('input', (e)=>{
+    const t = e.target;
+    if(t.dataset && t.dataset.key){
+      fieldValues[t.dataset.key] = t.value;
+      scheduleSave();
+      if(t.dataset.key.includes('|schedule|') || t.dataset.key.endsWith('|year')) recalcFromSchedules();
+    }
+  });
+
+  document.addEventListener('click', (e)=>{
+    const t = e.target;
+    if(t.classList.contains('toggle-standings')){
+      const panel = t.closest('.season-block').querySelector('.season-standings');
+      const open = panel.classList.toggle('open');
+      t.textContent = open ? 'Season Standings ▴' : 'Season Standings ▾';
+    }else if(t.classList.contains('toggle-schedules')){
+      const panel = t.closest('.season-block').querySelector('.season-schedules');
+      const open = panel.classList.toggle('open');
+      t.textContent = open ? 'Team Schedules ▴' : 'Team Schedules ▾';
+    }else if(t.classList.contains('remove-season')){
+      const id = t.dataset.seasonId;
+      if(!confirm('Remove this season and everything entered for it? This cannot be undone.')) return;
+      seasonIds = seasonIds.filter(x=> x !== id);
+      Object.keys(fieldValues).forEach(k=>{ if(k.startsWith(`season|${id}|`)) delete fieldValues[k]; });
+      renderSeasons();
+      recalcFromSchedules();
+      scheduleSave();
+    }else if(t.classList.contains('remove-draft')){
+      const id = t.dataset.draftId;
+      if(!confirm('Remove this draft class and everything entered for it? This cannot be undone.')) return;
+      draftIds = draftIds.filter(x=> x !== id);
+      Object.keys(fieldValues).forEach(k=>{ if(k.startsWith(`draft|${id}|`)) delete fieldValues[k]; });
+      renderDrafts();
+      scheduleSave();
+    }else if(t.classList.contains('add-trade-btn')){
+      const yid = t.dataset.yearId;
+      let list = [];
+      try{ list = JSON.parse(fv(`trade|${yid}|list`, '[]')); }catch(e){ list = []; }
+      const tid = 't' + Date.now();
+      list.push(tid);
+      fieldValues[`trade|${yid}|list`] = JSON.stringify(list);
+      renderTradeYears();
+      scheduleSave();
+    }else if(t.classList.contains('remove-trade')){
+      const yid = t.dataset.yearId;
+      const tid = t.dataset.tradeId;
+      let list = [];
+      try{ list = JSON.parse(fv(`trade|${yid}|list`, '[]')); }catch(e){ list = []; }
+      list = list.filter(x=> x !== tid);
+      fieldValues[`trade|${yid}|list`] = JSON.stringify(list);
+      Object.keys(fieldValues).forEach(k=>{ if(k.startsWith(`trade|${yid}|${tid}|`)) delete fieldValues[k]; });
+      renderTradeYears();
+      scheduleSave();
+    }else if(t.classList.contains('remove-trade-year')){
+      const yid = t.dataset.yearId;
+      if(!confirm('Remove this year and all trades logged under it? This cannot be undone.')) return;
+      tradeYearIds = tradeYearIds.filter(x=> x !== yid);
+      Object.keys(fieldValues).forEach(k=>{ if(k.startsWith(`trade|${yid}|`)) delete fieldValues[k]; });
+      renderTradeYears();
+      scheduleSave();
+    }
+  });
+
+  document.addEventListener('change', (e)=>{
+    const t = e.target;
+    if(t.dataset && t.dataset.key){
+      fieldValues[t.dataset.key] = t.value;
+      scheduleSave();
+      if(t.dataset.key.includes('|schedule|') || t.dataset.key.endsWith('|year')) recalcFromSchedules();
+    }
+    if(t.classList.contains('schedule-team-select')){
+      const container = t.closest('.season-schedules');
+      const team = t.value;
+      container.querySelectorAll('.team-schedule').forEach(tbl=>{
+        tbl.classList.toggle('active', tbl.dataset.team === team);
+      });
+      container.querySelector('.schedule-empty').classList.toggle('hidden', !!team);
+    }
+    if(t.classList.contains('trade-team-select')){
+      applyTradeFilter();
+    }
+  });
+
+  // ---------- H2H + All-Time Standings (auto-calculated from Team Schedules) ----------
+  function computeH2HAndStandings(){
+    const processedKeys = new Set();
+    const games = [];
+
+    const seasonsSorted = seasonIds.map((id, idx)=>{
+      const yearRaw = fv(`season|${id}|year`);
+      const yearNum = parseInt(yearRaw, 10);
+      return {id, idx, year: isNaN(yearNum) ? Infinity : yearNum, yearLabel: yearRaw || '20XX'};
+    }).sort((a,b)=> (a.year - b.year) || (a.idx - b.idx));
+
+    seasonsSorted.forEach(s=>{
+      WEEK_LIST.forEach(w=>{
+        TEAM_LIST.forEach(teamX=>{
+          const opp = fv(`season|${s.id}|schedule|${teamX}|${w.key}|opponent`);
+          const result = fv(`season|${s.id}|schedule|${teamX}|${w.key}|result`);
+          if(!opp || opp === teamX || !TEAM_LIST.includes(opp)) return;
+          if(result !== 'W' && result !== 'L') return;
+          const pairKey = [teamX, opp].slice().sort().join('|');
+          const gameKey = `${s.id}|${w.key}|${pairKey}`;
+          if(processedKeys.has(gameKey)) return;
+          processedKeys.add(gameKey);
+          const pfVal = parseFloat(fv(`season|${s.id}|schedule|${teamX}|${w.key}|pf`));
+          const paVal = parseFloat(fv(`season|${s.id}|schedule|${teamX}|${w.key}|pa`));
+          games.push({
+            teamX, teamY: opp,
+            winner: result === 'W' ? teamX : opp,
+            scoreX: isNaN(pfVal) ? null : pfVal,
+            scoreY: isNaN(paVal) ? null : paVal,
+            year: s.yearLabel, weekLabel: w.label
+          });
+        });
+      });
+    });
+
+    const pairStats = {};
+    document.querySelectorAll('#h2hTable tbody tr').forEach(row=>{
+      const teams = (row.dataset.teams || '').split('|');
+      if(teams.length === 2){
+        pairStats[row.dataset.teams] = {winsFirst:0, winsSecond:0, year:'', scoreFirst:null, scoreSecond:null};
+      }
+    });
+
+    const totals = {};
+    TEAM_LIST.forEach(t=> totals[t] = {wins:0, losses:0, pf:0, pa:0});
+
+    games.forEach(g=>{
+      totals[g.teamX].wins += (g.winner === g.teamX) ? 1 : 0;
+      totals[g.teamX].losses += (g.winner === g.teamX) ? 0 : 1;
+      totals[g.teamY].wins += (g.winner === g.teamY) ? 1 : 0;
+      totals[g.teamY].losses += (g.winner === g.teamY) ? 0 : 1;
+      if(g.scoreX !== null){ totals[g.teamX].pf += g.scoreX; totals[g.teamY].pa += g.scoreX; }
+      if(g.scoreY !== null){ totals[g.teamY].pf += g.scoreY; totals[g.teamX].pa += g.scoreY; }
+
+      const idxX = TEAM_LIST.indexOf(g.teamX), idxY = TEAM_LIST.indexOf(g.teamY);
+      const first = idxX < idxY ? g.teamX : g.teamY;
+      const second = idxX < idxY ? g.teamY : g.teamX;
+      const ps = pairStats[`${first}|${second}`];
+      if(!ps) return;
+      const firstIsX = first === g.teamX;
+      const scoreFirst = firstIsX ? g.scoreX : g.scoreY;
+      const scoreSecond = firstIsX ? g.scoreY : g.scoreX;
+      if(g.winner === first) ps.winsFirst++; else ps.winsSecond++;
+      ps.year = g.year;
+      ps.scoreFirst = scoreFirst;
+      ps.scoreSecond = scoreSecond;
+    });
+
+    return {pairStats, totals};
+  }
+
+  function recalcFromSchedules(){
+    const h2hTable = el('h2hTable');
+    const standingsBody = el('alltimeStandingsTbody');
+    if(!h2hTable || !standingsBody) return;
+    const {pairStats, totals} = computeH2HAndStandings();
+
+    document.querySelectorAll('#h2hTable tbody tr').forEach(row=>{
+      const ps = pairStats[row.dataset.teams];
+      if(!ps) return;
+      row.querySelector('.h2h-record').textContent = `${ps.winsFirst}-${ps.winsSecond}`;
+      row.querySelector('.h2h-year').textContent = ps.year || '–';
+      row.querySelector('.h2h-score1').textContent = ps.scoreFirst != null ? ps.scoreFirst.toFixed(2) : '–';
+      row.querySelector('.h2h-score2').textContent = ps.scoreSecond != null ? ps.scoreSecond.toFixed(2) : '–';
+    });
+
+    const rows = TEAM_LIST.map(t=>({team:t, ...totals[t]}));
+    rows.sort((a,b)=>{
+      const pctA = (a.wins+a.losses) ? a.wins/(a.wins+a.losses) : 0;
+      const pctB = (b.wins+b.losses) ? b.wins/(b.wins+b.losses) : 0;
+      return (pctB - pctA) || (b.wins - a.wins);
+    });
+
+    standingsBody.innerHTML = rows.map((r,i)=>{
+      const total = r.wins + r.losses;
+      const pct = total ? (r.wins/total*100).toFixed(1) : '0.0';
+      return `<tr>
+        <td class="rank-cell">${i+1}</td>
+        <td>${r.team}</td>
+        <td>${r.wins}</td>
+        <td>${r.losses}</td>
+        <td>${pct}%</td>
+        <td>${r.pf.toFixed(2)}</td>
+        <td>${r.pa.toFixed(2)}</td>
+      </tr>`;
+    }).join('');
+  }
+
+
+  // ---------- H2H team filter ----------
+  const h2hSelect = el('h2hTeamSelect');
+  if(h2hSelect){
+    h2hSelect.addEventListener('change', ()=>{
+      const team = h2hSelect.value;
+      const rows = document.querySelectorAll('#h2hTable tbody tr');
+      let visibleCount = 0;
+      rows.forEach(row=>{
+        const teams = (row.dataset.teams || '').split('|');
+        const show = !team || teams.includes(team);
+        row.style.display = show ? '' : 'none';
+        if(show) visibleCount++;
+      });
+      el('h2hEmpty').style.display = visibleCount === 0 ? 'block' : 'none';
+      el('h2hTable').style.display = visibleCount === 0 ? 'none' : 'table';
+    });
+  }
+
+  // ---------- Trades team filter (dynamic trade rows) ----------
+  function applyTradeFilter(){
+    const sel = el('tradeTeamSelect');
+    if(!sel) return;
+    const team = sel.value;
+    const yearBlocks = document.querySelectorAll('#tradesContainer .trade-year-block');
+    yearBlocks.forEach(block=>{
+      let blockHasVisible = false;
+      block.querySelectorAll('.trade-row').forEach(row=>{
+        const t1 = row.querySelector('[data-key$="|team1"]');
+        const t2 = row.querySelector('[data-key$="|team2"]');
+        const show = !team || (t1 && t1.value === team) || (t2 && t2.value === team);
+        row.style.display = show ? '' : 'none';
+        if(show) blockHasVisible = true;
+      });
+      block.style.display = blockHasVisible ? '' : 'none';
+    });
+    const anyBlockVisible = Array.from(yearBlocks).some(b=> b.style.display !== 'none');
+    el('tradesEmpty').style.display = (team && tradeYearIds.length && !anyBlockVisible) ? 'block' : 'none';
+  }
+  const tradeSelect = el('tradeTeamSelect');
+  if(tradeSelect){
+    tradeSelect.addEventListener('change', applyTradeFilter);
+  }
+
+  // ---------- Persisted league id ----------
+  function loadSavedLeagueId(){
+    try{
+      const saved = localStorage.getItem('dynasty-league-id');
+      if(saved){
+        el('leagueIdInput').value = saved;
+        connect(saved);
+      }
+    }catch(e){ /* nothing saved yet */ }
+  }
+
+  el('connectBtn').addEventListener('click', ()=>{
+    const id = el('leagueIdInput').value.trim();
+    if(!id){ setStatus('Enter a league ID first.', 'err'); return; }
+    connect(id);
+  });
+  el('refreshBtn').addEventListener('click', ()=> refreshAll(true));
+  el('autoRefreshToggle').addEventListener('change', (e)=>{
+    state.autoRefresh = e.target.checked;
+    setupAutoRefresh();
+  });
+
+  async function connect(id){
+    setStatus('Connecting…');
+    el('connectBtn').disabled = true;
+    try{
+      const league = await fetchJSON(`${SLEEPER}/league/${id}`);
+      if(!league || league.error){ throw new Error('League not found'); }
+      state.leagueId = id;
+      state.league = league;
+      try{ localStorage.setItem('dynasty-league-id', id); }catch(e){}
+      el('leagueTitle').textContent = league.name || 'Sellahts Dynasty League';
+      el('leagueSubtitle').textContent = `${league.season} season · ${league.total_rosters} teams · league ID ${id}`;
+      el('refreshBtn').disabled = false;
+      el('tickerWrap').style.display = 'flex';
+      await Promise.all([fetchPlayersDict(), fetchNflState()]);
+      await refreshAll(false);
+      setStatus('Connected.', 'ok');
+      setupAutoRefresh();
+    }catch(err){
+      console.error(err);
+      setStatus('Could not load that league. Double-check the League ID.', 'err');
+    }finally{
+      el('connectBtn').disabled = false;
+    }
+  }
+
+  async function fetchJSON(url){
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('Request failed: '+url);
+    return res.json();
+  }
+
+  async function fetchNflState(){
+    try{
+      state.nflState = await fetchJSON(`${SLEEPER}/state/nfl`);
+      state.currentWeek = state.nflState.week || 1;
+    }catch(e){ state.currentWeek = 1; }
+  }
+
+  let playersFetchPromise = null;
+  async function fetchPlayersDict(){
+    if(state.playersDict) return;
+    if(playersFetchPromise) return playersFetchPromise;
+    playersFetchPromise = fetchJSON(`${SLEEPER}/players/nfl`).then(data=>{
+      state.playersDict = data;
+    }).catch(e=>{
+      console.error('players dict failed', e);
+      state.playersDict = {};
+    });
+    return playersFetchPromise;
+  }
+
+  async function fetchSeasonPlayerPoints(){
+    if(!state.leagueId) return;
+    const week = Math.max(1, state.currentWeek || 1);
+    const weekNums = [];
+    for(let w=1; w<=week; w++) weekNums.push(w);
+    try{
+      const allWeeks = await Promise.all(
+        weekNums.map(w=> fetchJSON(`${SLEEPER}/league/${state.leagueId}/matchups/${w}`).catch(()=>[]))
+      );
+      const totals = {};
+      allWeeks.forEach(weekData=>{
+        (weekData || []).forEach(entry=>{
+          const pts = entry.players_points || {};
+          Object.keys(pts).forEach(pid=>{
+            totals[pid] = (totals[pid] || 0) + (pts[pid] || 0);
+          });
+        });
+      });
+      state.playerPoints = totals;
+    }catch(e){
+      console.error('player points fetch failed', e);
+    }
+  }
+
+  async function refreshAll(manual){
+    if(!state.leagueId) return;
+    if(manual) setStatus('Refreshing…');
+    try{
+      const [rosters, users] = await Promise.all([
+        fetchJSON(`${SLEEPER}/league/${state.leagueId}/rosters`),
+        fetchJSON(`${SLEEPER}/league/${state.leagueId}/users`)
+      ]);
+      state.rosters = rosters || [];
+      state.users = users || [];
+      renderTeams();
+      renderStandings();
+      await setupWeekSelect();
+      await fetchSeasonPlayerPoints();
+      renderPlayers();
+      renderTicker();
+      if(manual) setStatus('Up to date.', 'ok');
+    }catch(err){
+      console.error(err);
+      if(manual) setStatus('Refresh failed — will retry.', 'err');
+    }
+  }
+
+  function setupAutoRefresh(){
+    if(state.timer) clearInterval(state.timer);
+    if(state.autoRefresh && state.leagueId){
+      state.timer = setInterval(()=> refreshAll(false), 30000);
+    }
+  }
+
+  // ---------- helpers ----------
+  function userFor(ownerId){
+    return state.users.find(u=>u.user_id === ownerId) || {};
+  }
+  function teamNameFor(roster){
+    const u = userFor(roster.owner_id);
+    return (u.metadata && u.metadata.team_name) || u.display_name || `Team ${roster.roster_id}`;
+  }
+  function avatarUrl(u){
+    if(u && u.avatar) return `https://sleepercdn.com/avatars/thumbs/${u.avatar}`;
+    return `https://sleepercdn.com/images/v2/icons/player_default.webp`;
+  }
+  function fpts(roster, against){
+    const base = against ? (roster.settings.fpts_against||0) : (roster.settings.fpts||0);
+    const dec = against ? (roster.settings.fpts_against_decimal||0) : (roster.settings.fpts_decimal||0);
+    return base + dec/100;
+  }
+  function playerInfo(pid){
+    if(!state.playersDict) return null;
+    return state.playersDict[pid];
+  }
+  function playerLabel(pid){
+    const p = playerInfo(pid);
+    if(!p) return pid;
+    if(p.position === 'DEF') return p.first_name || pid;
+    return `${p.first_name||''} ${p.last_name||''}`.trim() || pid;
+  }
+
+  // ---------- Teams ----------
+  function renderTeams(){
+    const grid = el('teamsGrid');
+    if(!state.rosters.length){ el('teamsEmpty').style.display='block'; grid.style.display='none'; return; }
+    el('teamsEmpty').style.display='none'; grid.style.display='grid';
+    const sorted = [...state.rosters].sort((a,b)=> (b.settings.wins - a.settings.wins) || (fpts(b) - fpts(a)));
+    grid.innerHTML = sorted.map(r=>{
+      const u = userFor(r.owner_id);
+      const starters = r.starters || [];
+      const allPlayers = r.players || [];
+      const bench = allPlayers.filter(p=>!starters.includes(p));
+      const rows = [...starters, ...bench].map(pid=>{
+        const p = playerInfo(pid);
+        const pos = p ? p.position : '';
+        const nfl = p ? (p.team || 'FA') : '';
+        return `<div class="pos-row"><span class="pos-badge">${pos||'--'}</span><span class="plyr-name">${playerLabel(pid)}</span><span class="plyr-team">${nfl}</span></div>`;
+      }).join('');
+      return `
+      <div class="team-card" data-roster="${r.roster_id}">
+        <div class="team-card-head">
+          <img class="team-avatar" src="${avatarUrl(u)}" onerror="this.style.visibility='hidden'">
+          <div>
+            <div class="team-name">${teamNameFor(r)}</div>
+            <div class="owner-name">${u.display_name||''}</div>
+          </div>
+        </div>
+        <div class="team-record">
+          <span class="rec-win">${r.settings.wins||0}-${r.settings.losses||0}${r.settings.ties?('-'+r.settings.ties):''}</span>
+          <span class="rec-pts">${fpts(r).toFixed(2)} PF · ${fpts(r,true).toFixed(2)} PA</span>
+        </div>
+        <div class="roster-detail">${rows}</div>
+      </div>`;
+    }).join('');
+    grid.querySelectorAll('.team-card').forEach(card=>{
+      card.addEventListener('click', ()=>{
+        card.querySelector('.roster-detail').classList.toggle('open');
+      });
+    });
+  }
+
+  // ---------- Standings ----------
+  function renderStandings(){
+    if(!state.rosters.length){ el('standingsEmpty').style.display='block'; el('standingsTable').style.display='none'; return; }
+    el('standingsEmpty').style.display='none'; el('standingsTable').style.display='table';
+    const sorted = [...state.rosters].sort((a,b)=> (b.settings.wins - a.settings.wins) || (fpts(b) - fpts(a)));
+    el('standingsTbody').innerHTML = sorted.map((r,i)=>{
+      const cachedOdds = state.playoffOdds ? state.playoffOdds[r.roster_id] : null;
+      const oddsText = cachedOdds != null ? `${cachedOdds.toFixed(0)}%` : '…';
+      return `
+      <tr data-roster-id="${r.roster_id}">
+        <td class="rank-cell">${i+1}</td>
+        <td>${teamNameFor(r)}</td>
+        <td>${r.settings.wins||0}</td>
+        <td>${r.settings.losses||0}</td>
+        <td>${r.settings.ties||0}</td>
+        <td>${fpts(r).toFixed(2)}</td>
+        <td>${fpts(r,true).toFixed(2)}</td>
+        <td class="odds-cell">${oddsText}</td>
+      </tr>`;
+    }).join('');
+    computePlayoffOdds();
+  }
+
+  function updatePlayoffOddsCells(){
+    document.querySelectorAll('#standingsTbody tr').forEach(tr=>{
+      const rid = tr.dataset.rosterId;
+      const odds = state.playoffOdds ? state.playoffOdds[rid] : null;
+      const cell = tr.querySelector('.odds-cell');
+      if(cell) cell.textContent = odds != null ? `${odds.toFixed(0)}%` : '–';
+    });
+  }
+
+  async function computePlayoffOdds(){
+    if(!state.leagueId || !state.league || !state.rosters.length) return;
+    try{
+      const settings = state.league.settings || {};
+      const playoffTeams = settings.playoff_teams || Math.max(2, Math.ceil(state.rosters.length/2));
+      const playoffWeekStart = settings.playoff_week_start || 15;
+      const regularSeasonEnd = playoffWeekStart - 1;
+      const startWeek = state.currentWeek || 1;
+
+      const odds = {};
+
+      if(startWeek > regularSeasonEnd){
+        const sorted = [...state.rosters].sort((a,b)=> (b.settings.wins - a.settings.wins) || (fpts(b)-fpts(a)));
+        sorted.forEach((r,i)=>{ odds[r.roster_id] = i < playoffTeams ? 100 : 0; });
+        state.playoffOdds = odds;
+        updatePlayoffOddsCells();
+        return;
+      }
+
+      const weekNums = [];
+      for(let w=startWeek; w<=regularSeasonEnd; w++) weekNums.push(w);
+
+      const weeksData = await Promise.all(
+        weekNums.map(w=> fetchJSON(`${SLEEPER}/league/${state.leagueId}/matchups/${w}`).catch(()=>[]))
+      );
+
+      const weeklyPairings = weeksData.map(weekEntries=>{
+        const byMid = {};
+        (weekEntries || []).forEach(e=>{
+          if(e.matchup_id == null) return;
+          byMid[e.matchup_id] = byMid[e.matchup_id] || [];
+          byMid[e.matchup_id].push(e.roster_id);
+        });
+        return Object.values(byMid).filter(p=> p.length === 2);
+      });
+
+      const avgPts = {};
+      state.rosters.forEach(r=>{
+        const games = (r.settings.wins||0) + (r.settings.losses||0) + (r.settings.ties||0);
+        avgPts[r.roster_id] = games > 0 ? fpts(r)/games : 100;
+      });
+
+      const N = 500;
+      const inCount = {};
+      state.rosters.forEach(r=> inCount[r.roster_id] = 0);
+
+      for(let trial=0; trial<N; trial++){
+        const wins = {};
+        state.rosters.forEach(r=>{ wins[r.roster_id] = r.settings.wins || 0; });
+
+        weeklyPairings.forEach(pairs=>{
+          pairs.forEach(pair=>{
+            const [ra, rb] = pair;
+            const avgA = avgPts[ra] ?? 100, avgB = avgPts[rb] ?? 100;
+            let pA = avgA / ((avgA + avgB) || 1);
+            pA = Math.min(0.85, Math.max(0.15, pA));
+            if(Math.random() < pA){ wins[ra] = (wins[ra]||0) + 1; }
+            else{ wins[rb] = (wins[rb]||0) + 1; }
+          });
+        });
+
+        const ranked = [...state.rosters].sort((a,b)=>{
+          const wa = wins[a.roster_id] || 0, wb = wins[b.roster_id] || 0;
+          if(wb !== wa) return wb - wa;
+          const fa = fpts(a), fb = fpts(b);
+          if(fb !== fa) return fb - fa;
+          return Math.random() - 0.5;
+        });
+        ranked.slice(0, playoffTeams).forEach(r=>{ inCount[r.roster_id]++; });
+      }
+
+      state.rosters.forEach(r=>{ odds[r.roster_id] = (inCount[r.roster_id]/N) * 100; });
+      state.playoffOdds = odds;
+      updatePlayoffOddsCells();
+    }catch(e){
+      console.error('playoff odds calc failed', e);
+    }
+  }
+
+  // ---------- Matchups ----------
+  async function setupWeekSelect(){
+    const sel = el('weekSelect');
+    if(!sel.dataset.built){
+      let opts = '';
+      for(let w=1; w<=18; w++){ opts += `<option value="${w}">Week ${w}</option>`; }
+      sel.innerHTML = opts;
+      sel.value = state.currentWeek || 1;
+      sel.dataset.built = '1';
+      sel.addEventListener('change', ()=> loadMatchups(sel.value));
+    }
+    await loadMatchups(sel.value);
+  }
+
+  async function loadMatchups(week){
+    if(!state.leagueId) return;
+    el('matchupsEmpty').style.display='none';
+    el('matchupsBody').style.display='block';
+    try{
+      const data = await fetchJSON(`${SLEEPER}/league/${state.leagueId}/matchups/${week}`);
+      renderMatchups(data || []);
+    }catch(e){
+      el('matchupsGrid').innerHTML = `<div class="empty-state"><b>Couldn't load week ${week}</b>Try again in a moment.</div>`;
+    }
+  }
+
+  function renderMatchups(data){
+    const byMid = {};
+    data.forEach(m=>{
+      if(m.matchup_id == null) return;
+      byMid[m.matchup_id] = byMid[m.matchup_id] || [];
+      byMid[m.matchup_id].push(m);
+    });
+    const cards = Object.values(byMid).map(pair=>{
+      if(pair.length < 2){
+        const r = state.rosters.find(x=>x.roster_id === pair[0].roster_id);
+        const u = userFor(r ? r.owner_id : null);
+        return `<div class="matchup-card"><div class="mu-row"><div class="mu-team"><img src="${avatarUrl(u)}"><span class="mu-team-name">${r?teamNameFor(r):'TBD'}</span></div><div class="mu-score">${(pair[0].points||0).toFixed(2)}</div></div></div>`;
+      }
+      const [a,b] = pair;
+      const ra = state.rosters.find(x=>x.roster_id === a.roster_id);
+      const rb = state.rosters.find(x=>x.roster_id === b.roster_id);
+      const ua = userFor(ra ? ra.owner_id : null);
+      const ub = userFor(rb ? rb.owner_id : null);
+      const aWin = (a.points||0) > (b.points||0);
+      const bWin = (b.points||0) > (a.points||0);
+      return `
+      <div class="matchup-card">
+        <div class="mu-row">
+          <div class="mu-team"><img src="${avatarUrl(ua)}"><span class="mu-team-name">${ra?teamNameFor(ra):'TBD'}</span></div>
+          <div class="mu-score ${aWin?'winning':''}">${(a.points||0).toFixed(2)}</div>
+        </div>
+        <div class="mu-divider"></div>
+        <div class="mu-row">
+          <div class="mu-team"><img src="${avatarUrl(ub)}"><span class="mu-team-name">${rb?teamNameFor(rb):'TBD'}</span></div>
+          <div class="mu-score ${bWin?'winning':''}">${(b.points||0).toFixed(2)}</div>
+        </div>
+      </div>`;
+    }).join('');
+    el('matchupsGrid').innerHTML = cards || `<div class="empty-state"><b>No matchups yet</b>This week hasn't been scheduled or played.</div>`;
+  }
+
+  // ---------- Players ----------
+  let playersSortKey = 'points';
+  let playersSortDir = -1;
+
+  function rosteredPlayerRows(){
+    const rows = [];
+    state.rosters.forEach(r=>{
+      (r.players||[]).forEach(pid=>{
+        const p = playerInfo(pid);
+        if(!p) return;
+        rows.push({
+          pid, name: `${p.first_name||''} ${p.last_name||''}`.trim() || pid,
+          pos: p.position || '', nfl: p.team || 'FA', age: p.age || '',
+          status: p.injury_status || (p.status==='Active'?'':p.status) || '',
+          fteam: teamNameFor(r),
+          points: (state.playerPoints && state.playerPoints[pid]) || 0
+        });
+      });
+    });
+    return rows;
+  }
+
+  function renderPlayers(){
+    if(!state.rosters.length || !state.playersDict){ el('playersEmpty').style.display='block'; el('playersBody').style.display='none'; return; }
+    el('playersEmpty').style.display='none'; el('playersBody').style.display='block';
+    const rows = rosteredPlayerRows();
+
+    const posSel = el('posFilter');
+    if(!posSel.dataset.built){
+      const positions = [...new Set(rows.map(r=>r.pos))].filter(Boolean).sort();
+      posSel.innerHTML = '<option value="">All positions</option>' + positions.map(p=>`<option value="${p}">${p}</option>`).join('');
+      posSel.dataset.built = '1';
+    }
+    const teamSel = el('teamFilter');
+    if(!teamSel.dataset.built){
+      const teams = [...new Set(rows.map(r=>r.fteam))].sort();
+      teamSel.innerHTML = '<option value="">All rosters</option>' + teams.map(t=>`<option value="${t}">${t}</option>`).join('');
+      teamSel.dataset.built = '1';
+    }
+    drawPlayersTable();
+  }
+
+  function drawPlayersTable(){
+    let rows = rosteredPlayerRows();
+    const q = el('playerSearch').value.trim().toLowerCase();
+    const pos = el('posFilter').value;
+    const fteam = el('teamFilter').value;
+    if(q) rows = rows.filter(r=> r.name.toLowerCase().includes(q));
+    if(pos) rows = rows.filter(r=> r.pos === pos);
+    if(fteam) rows = rows.filter(r=> r.fteam === fteam);
+    rows.sort((a,b)=>{
+      const va = a[playersSortKey], vb = b[playersSortKey];
+      if(typeof va === 'number') return (va-vb)*playersSortDir;
+      return String(va).localeCompare(String(vb)) * playersSortDir;
+    });
+    el('playersTbody').innerHTML = rows.map((r,i)=>`
+      <tr>
+        <td class="rank-cell">${i+1}</td>
+        <td>${r.name}</td>
+        <td><span class="badge">${r.pos}</span></td>
+        <td>${r.nfl}</td>
+        <td>${r.age}</td>
+        <td>${r.status ? `<span class="badge inj">${r.status}</span>` : ''}</td>
+        <td>${r.fteam}</td>
+        <td>${r.points.toFixed(2)}</td>
+      </tr>`).join('') || `<tr><td colspan="8" style="color:var(--ink-muted);">No players match.</td></tr>`;
+  }
+  el('playerSearch').addEventListener('input', drawPlayersTable);
+  el('posFilter').addEventListener('change', drawPlayersTable);
+  el('teamFilter').addEventListener('change', drawPlayersTable);
+  document.querySelectorAll('#panel-players thead th').forEach(th=>{
+    th.addEventListener('click', ()=>{
+      const key = th.dataset.sort;
+      if(!key) return;
+      playersSortDir = (playersSortKey === key) ? -playersSortDir : 1;
+      playersSortKey = key;
+      drawPlayersTable();
+    });
+  });
+
+  // ---------- Ticker ----------
+  function renderTicker(){
+    const sorted = [...state.rosters].sort((a,b)=> (b.settings.wins - a.settings.wins) || (fpts(b) - fpts(a)));
+    const leader = sorted[0];
+    let text = leader ? `<span class="hi">LEADING THE LEAGUE:</span> ${teamNameFor(leader)} (${leader.settings.wins||0}-${leader.settings.losses||0}) &nbsp;&bull;&nbsp; ` : '';
+    text += `${state.league.name} &bull; ${state.league.season} season &bull; ${state.rosters.length} teams &bull; week ${state.currentWeek} &nbsp;&bull;&nbsp; `;
+    el('tickerTrack').innerHTML = text.repeat(3);
+  }
+
+  loadSavedLeagueId();
+  loadSiteData();
+})();
+</script>
+</body>
+</html>
