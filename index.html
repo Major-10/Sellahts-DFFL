@@ -736,15 +736,6 @@ Consequences for owner inactivity or league abandonment.</textarea>
   function teamLabel(id){ const custom = fv(`teamName|${id}`, ''); return custom || id; }
 
   function buildSeasonBlock(id){
-    const standingsRows = TEAM_LIST.map((team,i)=>`
-                <tr><td class="rank-cell">${i+1}</td><td data-team-label="${team}">${teamLabel(team)}</td>
-                  <td><input type="text" class="score-input" data-key="season|${id}|standings|${team}|w" placeholder="0"></td>
-                  <td><input type="text" class="score-input" data-key="season|${id}|standings|${team}|l" placeholder="0"></td>
-                  <td><input type="text" class="score-input" data-key="season|${id}|standings|${team}|t" placeholder="0"></td>
-                  <td><input type="text" class="score-input" data-key="season|${id}|standings|${team}|pf" placeholder="0.00"></td>
-                  <td><input type="text" class="score-input" data-key="season|${id}|standings|${team}|pa" placeholder="0.00"></td>
-                </tr>`).join('');
-
     const teamOptions = TEAM_LIST.map(t=>`<option value="${t}">${teamLabel(t)}</option>`).join('');
 
     const teamTables = TEAM_LIST.map(team=>{
@@ -773,14 +764,14 @@ Consequences for owner inactivity or league abandonment.</textarea>
               <div class="history-champ">
                 <div class="lbl">Champion</div>
                 <div class="val-row">
-                  <input type="text" class="score-input" data-key="season|${id}|championName" placeholder="🏆 Champion name">
+                  <select class="score-select" data-key="season|${id}|championName"><option value="">🏆 Select champion</option>${teamOptions}</select>
                   <input type="text" class="score-input" data-key="season|${id}|championScore" placeholder="Score">
                 </div>
               </div>
               <div class="history-champ">
                 <div class="lbl">Runner-up</div>
                 <div class="val-row">
-                  <input type="text" class="score-input" data-key="season|${id}|runnerupName" placeholder="Runner-up name">
+                  <select class="score-select" data-key="season|${id}|runnerupName"><option value="">Select runner-up</option>${teamOptions}</select>
                   <input type="text" class="score-input" data-key="season|${id}|runnerupScore" placeholder="Score">
                 </div>
               </div>
@@ -789,10 +780,10 @@ Consequences for owner inactivity or league abandonment.</textarea>
               <button class="remove-season" data-season-id="${id}">Remove</button>
             </div>
             <div class="season-standings">
+              <div class="empty-state" style="margin-bottom:10px; padding:12px 16px; text-align:left;"><b style="margin-bottom:0; font-size:15px;">Auto-ranked</b>Sorted by record, then PF, then PA — champion and runner-up are always pinned to 1st/2nd.</div>
               <table class="data-table standings-table">
                 <thead><tr><th>#</th><th>Team</th><th>W</th><th>L</th><th>T</th><th>PF</th><th>PA</th></tr></thead>
-                <tbody>${standingsRows}
-                </tbody>
+                <tbody class="standings-tbody"></tbody>
               </table>
             </div>
             <div class="season-schedules">
@@ -810,12 +801,63 @@ Consequences for owner inactivity or league abandonment.</textarea>
           </div>`;
   }
 
+  function renderSeasonStandingsTable(seasonId){
+    const tbody = document.querySelector(`.season-block[data-season-id="${seasonId}"] .standings-tbody`);
+    if(!tbody) return;
+    const champId = fv(`season|${seasonId}|championName`);
+    const runnerId = fv(`season|${seasonId}|runnerupName`);
+
+    const teamData = TEAM_LIST.map(team=>({
+      team,
+      w: parseFloat(fv(`season|${seasonId}|standings|${team}|w`)) || 0,
+      l: parseFloat(fv(`season|${seasonId}|standings|${team}|l`)) || 0,
+      t: parseFloat(fv(`season|${seasonId}|standings|${team}|t`)) || 0,
+      pf: parseFloat(fv(`season|${seasonId}|standings|${team}|pf`)) || 0,
+      pa: parseFloat(fv(`season|${seasonId}|standings|${team}|pa`)) || 0
+    }));
+
+    const forced = [];
+    if(champId){ const c = teamData.find(d=> d.team === champId); if(c) forced.push(c); }
+    if(runnerId && runnerId !== champId){ const r = teamData.find(d=> d.team === runnerId); if(r) forced.push(r); }
+    const forcedIds = forced.map(d=> d.team);
+
+    const rest = teamData.filter(d=> !forcedIds.includes(d.team));
+    rest.sort((a,b)=>{
+      if(b.w !== a.w) return b.w - a.w;
+      if(a.l !== b.l) return a.l - b.l;
+      if(b.pf !== a.pf) return b.pf - a.pf;
+      return a.pa - b.pa;
+    });
+
+    const ordered = [...forced, ...rest];
+
+    tbody.innerHTML = ordered.map((d,i)=>`
+                <tr><td class="rank-cell">${i+1}</td><td data-team-label="${d.team}">${teamLabel(d.team)}</td>
+                  <td><input type="text" class="score-input" data-key="season|${seasonId}|standings|${d.team}|w" placeholder="0"></td>
+                  <td><input type="text" class="score-input" data-key="season|${seasonId}|standings|${d.team}|l" placeholder="0"></td>
+                  <td><input type="text" class="score-input" data-key="season|${seasonId}|standings|${d.team}|t" placeholder="0"></td>
+                  <td><input type="text" class="score-input" data-key="season|${seasonId}|standings|${d.team}|pf" placeholder="0.00"></td>
+                  <td><input type="text" class="score-input" data-key="season|${seasonId}|standings|${d.team}|pa" placeholder="0.00"></td>
+                </tr>`).join('');
+    restoreFieldValues(tbody);
+  }
+
+  function maybeReorderSeasonStandings(key){
+    if(!key.startsWith('season|')) return;
+    const parts = key.split('|');
+    const seasonId = parts[1];
+    if(parts[2] === 'standings' || parts[2] === 'championName' || parts[2] === 'runnerupName'){
+      renderSeasonStandingsTable(seasonId);
+    }
+  }
+
   function renderSeasons(){
     const container = el('seasonsContainer');
     if(!container) return;
     container.innerHTML = seasonIds.map(buildSeasonBlock).join('');
     el('seasonsEmpty').style.display = seasonIds.length ? 'none' : 'block';
     restoreFieldValues(container);
+    seasonIds.forEach(id=> renderSeasonStandingsTable(id));
   }
 
   function restoreFieldValues(scope){
@@ -1082,6 +1124,7 @@ Consequences for owner inactivity or league abandonment.</textarea>
       fieldValues[t.dataset.key] = t.value;
       scheduleSave();
       if(t.dataset.key.includes('|schedule|') || t.dataset.key.endsWith('|year')) recalcFromSchedules();
+      maybeReorderSeasonStandings(t.dataset.key);
     }
     if(t.classList.contains('schedule-team-select')){
       const container = t.closest('.season-schedules');
