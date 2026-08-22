@@ -256,6 +256,11 @@
   .schedule-empty.hidden{display:none;}
 
   .add-season-row{display:flex; gap:10px; align-items:center; margin-bottom:18px; flex-wrap:wrap;}
+  .team-names-panel{margin-bottom:22px; padding-bottom:16px; border-bottom:1px solid var(--line);}
+  .team-names-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:10px;}
+  .team-name-field{display:flex; flex-direction:column; gap:4px;}
+  .team-name-field label{font-size:10px; color:var(--ink-muted); text-transform:uppercase; letter-spacing:0.5px; font-family:'IBM Plex Mono',monospace;}
+  .team-name-field input{width:100%;}
   .add-season-row input{width:160px;}
   .season-year-input{
     background:var(--bg-alt); border:1px solid var(--line); color:var(--gold);
@@ -515,6 +520,10 @@ Consequences for owner inactivity or league abandonment.</textarea>
       </nav>
 
       <div class="subpanel active" id="sub-seasons">
+        <div class="team-names-panel">
+          <div class="round-label" style="margin-top:0;">Team Names</div>
+          <div class="team-names-grid" id="teamNamesGrid"></div>
+        </div>
         <div class="add-season-row">
           <input type="text" id="newSeasonYear" class="score-input" placeholder="Year (e.g. 2025)">
           <button class="btn" id="addSeasonBtn">+ Add Season</button>
@@ -544,51 +553,51 @@ Consequences for owner inactivity or league abandonment.</textarea>
         <table class="data-table" id="h2hTable">
           <thead><tr><th>Matchup</th><th>All-Time Record</th><th>Last Meeting Year</th><th>Score (Team 1)</th><th>Score (Team 2)</th></tr></thead>
           <tbody>
-            <tr data-teams="Team A|Team B"><td>Team A vs Team B</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team A|Team C"><td>Team A vs Team C</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team A|Team D"><td>Team A vs Team D</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team A|Team E"><td>Team A vs Team E</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team A|Team F"><td>Team A vs Team F</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team A|Team G"><td>Team A vs Team G</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team A|Team H"><td>Team A vs Team H</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team A|Team I"><td>Team A vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team A|Team J"><td>Team A vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team B|Team C"><td>Team B vs Team C</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team B|Team D"><td>Team B vs Team D</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team B|Team E"><td>Team B vs Team E</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team B|Team F"><td>Team B vs Team F</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team B|Team G"><td>Team B vs Team G</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team B|Team H"><td>Team B vs Team H</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team B|Team I"><td>Team B vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team B|Team J"><td>Team B vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team C|Team D"><td>Team C vs Team D</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team C|Team E"><td>Team C vs Team E</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team C|Team F"><td>Team C vs Team F</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team C|Team G"><td>Team C vs Team G</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team C|Team H"><td>Team C vs Team H</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team C|Team I"><td>Team C vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team C|Team J"><td>Team C vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team D|Team E"><td>Team D vs Team E</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team D|Team F"><td>Team D vs Team F</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team D|Team G"><td>Team D vs Team G</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team D|Team H"><td>Team D vs Team H</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team D|Team I"><td>Team D vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team D|Team J"><td>Team D vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team E|Team F"><td>Team E vs Team F</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team E|Team G"><td>Team E vs Team G</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team E|Team H"><td>Team E vs Team H</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team E|Team I"><td>Team E vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team E|Team J"><td>Team E vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team F|Team G"><td>Team F vs Team G</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team F|Team H"><td>Team F vs Team H</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team F|Team I"><td>Team F vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team F|Team J"><td>Team F vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team G|Team H"><td>Team G vs Team H</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team G|Team I"><td>Team G vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team G|Team J"><td>Team G vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team H|Team I"><td>Team H vs Team I</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team H|Team J"><td>Team H vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
-            <tr data-teams="Team I|Team J"><td>Team I vs Team J</td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team B"><td><span data-team-label="Team A">Team A</span> vs <span data-team-label="Team B">Team B</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team C"><td><span data-team-label="Team A">Team A</span> vs <span data-team-label="Team C">Team C</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team D"><td><span data-team-label="Team A">Team A</span> vs <span data-team-label="Team D">Team D</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team E"><td><span data-team-label="Team A">Team A</span> vs <span data-team-label="Team E">Team E</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team F"><td><span data-team-label="Team A">Team A</span> vs <span data-team-label="Team F">Team F</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team G"><td><span data-team-label="Team A">Team A</span> vs <span data-team-label="Team G">Team G</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team H"><td><span data-team-label="Team A">Team A</span> vs <span data-team-label="Team H">Team H</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team I"><td><span data-team-label="Team A">Team A</span> vs <span data-team-label="Team I">Team I</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team A|Team J"><td><span data-team-label="Team A">Team A</span> vs <span data-team-label="Team J">Team J</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team C"><td><span data-team-label="Team B">Team B</span> vs <span data-team-label="Team C">Team C</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team D"><td><span data-team-label="Team B">Team B</span> vs <span data-team-label="Team D">Team D</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team E"><td><span data-team-label="Team B">Team B</span> vs <span data-team-label="Team E">Team E</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team F"><td><span data-team-label="Team B">Team B</span> vs <span data-team-label="Team F">Team F</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team G"><td><span data-team-label="Team B">Team B</span> vs <span data-team-label="Team G">Team G</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team H"><td><span data-team-label="Team B">Team B</span> vs <span data-team-label="Team H">Team H</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team I"><td><span data-team-label="Team B">Team B</span> vs <span data-team-label="Team I">Team I</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team B|Team J"><td><span data-team-label="Team B">Team B</span> vs <span data-team-label="Team J">Team J</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team C|Team D"><td><span data-team-label="Team C">Team C</span> vs <span data-team-label="Team D">Team D</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team C|Team E"><td><span data-team-label="Team C">Team C</span> vs <span data-team-label="Team E">Team E</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team C|Team F"><td><span data-team-label="Team C">Team C</span> vs <span data-team-label="Team F">Team F</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team C|Team G"><td><span data-team-label="Team C">Team C</span> vs <span data-team-label="Team G">Team G</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team C|Team H"><td><span data-team-label="Team C">Team C</span> vs <span data-team-label="Team H">Team H</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team C|Team I"><td><span data-team-label="Team C">Team C</span> vs <span data-team-label="Team I">Team I</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team C|Team J"><td><span data-team-label="Team C">Team C</span> vs <span data-team-label="Team J">Team J</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team D|Team E"><td><span data-team-label="Team D">Team D</span> vs <span data-team-label="Team E">Team E</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team D|Team F"><td><span data-team-label="Team D">Team D</span> vs <span data-team-label="Team F">Team F</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team D|Team G"><td><span data-team-label="Team D">Team D</span> vs <span data-team-label="Team G">Team G</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team D|Team H"><td><span data-team-label="Team D">Team D</span> vs <span data-team-label="Team H">Team H</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team D|Team I"><td><span data-team-label="Team D">Team D</span> vs <span data-team-label="Team I">Team I</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team D|Team J"><td><span data-team-label="Team D">Team D</span> vs <span data-team-label="Team J">Team J</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team E|Team F"><td><span data-team-label="Team E">Team E</span> vs <span data-team-label="Team F">Team F</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team E|Team G"><td><span data-team-label="Team E">Team E</span> vs <span data-team-label="Team G">Team G</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team E|Team H"><td><span data-team-label="Team E">Team E</span> vs <span data-team-label="Team H">Team H</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team E|Team I"><td><span data-team-label="Team E">Team E</span> vs <span data-team-label="Team I">Team I</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team E|Team J"><td><span data-team-label="Team E">Team E</span> vs <span data-team-label="Team J">Team J</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team F|Team G"><td><span data-team-label="Team F">Team F</span> vs <span data-team-label="Team G">Team G</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team F|Team H"><td><span data-team-label="Team F">Team F</span> vs <span data-team-label="Team H">Team H</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team F|Team I"><td><span data-team-label="Team F">Team F</span> vs <span data-team-label="Team I">Team I</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team F|Team J"><td><span data-team-label="Team F">Team F</span> vs <span data-team-label="Team J">Team J</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team G|Team H"><td><span data-team-label="Team G">Team G</span> vs <span data-team-label="Team H">Team H</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team G|Team I"><td><span data-team-label="Team G">Team G</span> vs <span data-team-label="Team I">Team I</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team G|Team J"><td><span data-team-label="Team G">Team G</span> vs <span data-team-label="Team J">Team J</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team H|Team I"><td><span data-team-label="Team H">Team H</span> vs <span data-team-label="Team I">Team I</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team H|Team J"><td><span data-team-label="Team H">Team H</span> vs <span data-team-label="Team J">Team J</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
+            <tr data-teams="Team I|Team J"><td><span data-team-label="Team I">Team I</span> vs <span data-team-label="Team J">Team J</span></td><td class="h2h-record">&ndash;</td><td class="h2h-year">&ndash;</td><td class="h2h-score1">&ndash;</td><td class="h2h-score2">&ndash;</td></tr>
           </tbody>
         </table>
         <div class="empty-state" id="h2hEmpty" style="display:none;"><b>No matchups yet</b>This team has no recorded meetings.</div>
@@ -724,10 +733,11 @@ Consequences for owner inactivity or league abandonment.</textarea>
   let saveTimer = null;
 
   function fv(key, fallback){ return fieldValues[key] !== undefined ? fieldValues[key] : (fallback || ''); }
+  function teamLabel(id){ const custom = fv(`teamName|${id}`, ''); return custom || id; }
 
   function buildSeasonBlock(id){
     const standingsRows = TEAM_LIST.map((team,i)=>`
-                <tr><td class="rank-cell">${i+1}</td><td>${team}</td>
+                <tr><td class="rank-cell">${i+1}</td><td data-team-label="${team}">${teamLabel(team)}</td>
                   <td><input type="text" class="score-input" data-key="season|${id}|standings|${team}|w" placeholder="0"></td>
                   <td><input type="text" class="score-input" data-key="season|${id}|standings|${team}|l" placeholder="0"></td>
                   <td><input type="text" class="score-input" data-key="season|${id}|standings|${team}|t" placeholder="0"></td>
@@ -735,10 +745,10 @@ Consequences for owner inactivity or league abandonment.</textarea>
                   <td><input type="text" class="score-input" data-key="season|${id}|standings|${team}|pa" placeholder="0.00"></td>
                 </tr>`).join('');
 
-    const teamOptions = TEAM_LIST.map(t=>`<option value="${t}">${t}</option>`).join('');
+    const teamOptions = TEAM_LIST.map(t=>`<option value="${t}">${teamLabel(t)}</option>`).join('');
 
     const teamTables = TEAM_LIST.map(team=>{
-      const opponentOptions = TEAM_LIST.filter(t=> t !== team).map(t=>`<option value="${t}">${t}</option>`).join('');
+      const opponentOptions = TEAM_LIST.filter(t=> t !== team).map(t=>`<option value="${t}">${teamLabel(t)}</option>`).join('');
       const rows = WEEK_LIST.map(w=>`
                     <tr><td>${w.label}</td>
                       <td><select class="score-select sched-input" data-key="season|${id}|schedule|${team}|${w.key}|opponent"><option value="">Opponent</option>${opponentOptions}</select></td>
@@ -854,17 +864,36 @@ Consequences for owner inactivity or league abandonment.</textarea>
       tradeYearIds = [];
       fieldValues = {};
     }
+    renderTeamNamesPanel();
     renderSeasons();
     renderDrafts();
     renderTradeYears();
     restoreFieldValues();
     recalcFromSchedules();
+    TEAM_LIST.forEach(id=> updateTeamLabelDisplays(id));
+  }
+
+  function renderTeamNamesPanel(){
+    const grid = el('teamNamesGrid');
+    if(!grid || grid.dataset.built) return;
+    grid.innerHTML = TEAM_LIST.map(id=>`
+      <div class="team-name-field">
+        <label>${id}</label>
+        <input type="text" class="score-input" data-key="teamName|${id}" placeholder="${id}">
+      </div>`).join('');
+    grid.dataset.built = '1';
+  }
+
+  function updateTeamLabelDisplays(id){
+    const label = teamLabel(id);
+    document.querySelectorAll(`option[value="${id}"]`).forEach(opt=>{ opt.textContent = label; });
+    document.querySelectorAll(`[data-team-label="${id}"]`).forEach(elm=>{ elm.textContent = label; });
   }
 
   const DRAFT_ROUNDS = 3;
 
   function buildDraftBlock(id){
-    const teamOptions = TEAM_LIST.map(t=>`<option value="${t}">${t}</option>`).join('');
+    const teamOptions = TEAM_LIST.map(t=>`<option value="${t}">${teamLabel(t)}</option>`).join('');
     let roundsHtml = '';
     for(let r=1; r<=DRAFT_ROUNDS; r++){
       let picksHtml = '';
@@ -908,7 +937,7 @@ Consequences for owner inactivity or league abandonment.</textarea>
 
   // ---------- Trade Archives ----------
   function buildTradeRow(yid, tid){
-    const teamOptions = TEAM_LIST.map(t=>`<option value="${t}">${t}</option>`).join('');
+    const teamOptions = TEAM_LIST.map(t=>`<option value="${t}">${teamLabel(t)}</option>`).join('');
     return `
               <div class="trade-row" data-trade-id="${tid}">
                 <select class="score-select trade-team-select" data-key="trade|${yid}|${tid}|team1"><option value="">Team</option>${teamOptions}</select>
@@ -985,6 +1014,11 @@ Consequences for owner inactivity or league abandonment.</textarea>
       fieldValues[t.dataset.key] = t.value;
       scheduleSave();
       if(t.dataset.key.includes('|schedule|') || t.dataset.key.endsWith('|year')) recalcFromSchedules();
+      if(t.dataset.key.startsWith('teamName|')){
+        const id = t.dataset.key.split('|')[1];
+        updateTeamLabelDisplays(id);
+        recalcFromSchedules();
+      }
     }
   });
 
@@ -1160,7 +1194,7 @@ Consequences for owner inactivity or league abandonment.</textarea>
       const pct = total ? (r.wins/total*100).toFixed(1) : '0.0';
       return `<tr>
         <td class="rank-cell">${i+1}</td>
-        <td>${r.team}</td>
+        <td data-team-label="${r.team}">${teamLabel(r.team)}</td>
         <td>${r.wins}</td>
         <td>${r.losses}</td>
         <td>${pct}%</td>
