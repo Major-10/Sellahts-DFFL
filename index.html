@@ -812,12 +812,38 @@ Consequences for owner inactivity or league abandonment.</textarea>
           </div>`;
   }
 
+  function reorderSeasonStandingsByRank(seasonId){
+    const block = document.querySelector(`.season-block[data-season-id="${seasonId}"]`);
+    if(!block) return;
+    const tbody = block.querySelector('.season-standings tbody');
+    if(!tbody) return;
+
+    const ranked = TEAM_LIST.map(team=>{
+      const rankNum = parseFloat(fv(`season|${seasonId}|standings|${team}|rank`));
+      return {team, rank: isNaN(rankNum) ? Infinity : rankNum};
+    });
+    ranked.sort((a,b)=> a.rank - b.rank);
+
+    tbody.innerHTML = ranked.map(({team})=>`
+                <tr>
+                  <td><input type="text" class="score-input rank-input" data-key="season|${seasonId}|standings|${team}|rank" placeholder="#"></td>
+                  <td data-team-label="${team}">${teamLabel(team)}</td>
+                  <td><input type="text" class="score-input" data-key="season|${seasonId}|standings|${team}|w" placeholder="0"></td>
+                  <td><input type="text" class="score-input" data-key="season|${seasonId}|standings|${team}|l" placeholder="0"></td>
+                  <td><input type="text" class="score-input" data-key="season|${seasonId}|standings|${team}|t" placeholder="0"></td>
+                  <td><input type="text" class="score-input" data-key="season|${seasonId}|standings|${team}|pf" placeholder="0.00"></td>
+                  <td><input type="text" class="score-input" data-key="season|${seasonId}|standings|${team}|pa" placeholder="0.00"></td>
+                </tr>`).join('');
+    restoreFieldValues(tbody);
+  }
+
   function renderSeasons(){
     const container = el('seasonsContainer');
     if(!container) return;
     container.innerHTML = seasonIds.map(buildSeasonBlock).join('');
     el('seasonsEmpty').style.display = seasonIds.length ? 'none' : 'block';
     restoreFieldValues(container);
+    seasonIds.forEach(id=> reorderSeasonStandingsByRank(id));
   }
 
   function restoreFieldValues(scope){
@@ -1084,6 +1110,10 @@ Consequences for owner inactivity or league abandonment.</textarea>
       fieldValues[t.dataset.key] = t.value;
       scheduleSave();
       if(t.dataset.key.includes('|schedule|') || t.dataset.key.endsWith('|year')) recalcFromSchedules();
+    }
+    if(t.classList.contains('rank-input')){
+      const seasonId = t.dataset.key.split('|')[1];
+      reorderSeasonStandingsByRank(seasonId);
     }
     if(t.classList.contains('schedule-team-select')){
       const container = t.closest('.season-schedules');
