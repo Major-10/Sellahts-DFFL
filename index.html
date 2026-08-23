@@ -255,6 +255,7 @@
   .team-schedule.active{display:block;}
   .schedule-empty{padding:26px 20px;}
   .schedule-empty.hidden{display:none;}
+  .draft-round-empty.hidden{display:none;}
 
   .add-season-row{display:flex; gap:10px; align-items:center; margin-bottom:18px; flex-wrap:wrap;}
   .team-names-panel{margin-bottom:22px; padding-bottom:16px; border-bottom:1px solid var(--line);}
@@ -365,6 +366,13 @@
   }
   .remove-trade-year:hover{background:var(--red); color:#fff;}
   .add-trade-btn{font-size:12px; padding:7px 12px; margin-bottom:20px;}
+  .trade-team-body{margin-top:10px;}
+
+  /* ---------- Draft Archives collapse/round select ---------- */
+  .draft-picks{display:none; margin-top:10px;}
+  .draft-picks.open{display:block;}
+  .draft-round{display:none;}
+  .draft-round.active{display:block;}
 
   @media (max-width: 760px){
     .layout{flex-direction:column;}
@@ -617,25 +625,8 @@ Consequences for owner inactivity or league abandonment.</textarea>
           <input type="text" id="newTradeYear" class="score-input" placeholder="Year (e.g. 2025)">
           <button class="btn" id="addTradeYearBtn">+ Add Year</button>
         </div>
-        <div class="week-select-row">
-          <label for="tradeTeamSelect">FILTER BY TEAM</label>
-          <select id="tradeTeamSelect">
-            <option value="">All Teams</option>
-            <option value="Team A">Team A</option>
-            <option value="Team B">Team B</option>
-            <option value="Team C">Team C</option>
-            <option value="Team D">Team D</option>
-            <option value="Team E">Team E</option>
-            <option value="Team F">Team F</option>
-            <option value="Team G">Team G</option>
-            <option value="Team H">Team H</option>
-            <option value="Team I">Team I</option>
-            <option value="Team J">Team J</option>
-          </select>
-        </div>
         <div id="tradesContainer"></div>
         <div class="empty-state" id="tradesYearsEmpty" style="display:none;"><b>No trade years yet</b>Enter a year above and hit "+ Add Year" to start logging trades.</div>
-        <div class="empty-state" id="tradesEmpty" style="display:none;"><b>No trades yet</b>This team has no recorded trades.</div>
       </div>
 
       <div class="subpanel" id="sub-drafts">
@@ -937,21 +928,35 @@ Consequences for owner inactivity or league abandonment.</textarea>
                 </tr>`;
       }
       roundsHtml += `
-            <div class="round-label">Round ${r}</div>
-            <table class="data-table">
-              <thead><tr><th>Pick</th><th>Team</th><th>Player</th><th>Position</th><th>School</th></tr></thead>
-              <tbody>${picksHtml}
-              </tbody>
-            </table>`;
+            <div class="draft-round" data-round="${r}">
+              <div class="round-label">Round ${r}</div>
+              <table class="data-table">
+                <thead><tr><th>Pick</th><th>Team</th><th>Player</th><th>Position</th><th>School</th></tr></thead>
+                <tbody>${picksHtml}
+                </tbody>
+              </table>
+            </div>`;
     }
+    const roundOptions = Array.from({length: DRAFT_ROUNDS}, (_,i)=> `<option value="${i+1}">Round ${i+1}</option>`).join('');
     return `
           <div class="draft-block" data-draft-id="${id}">
             <div class="draft-head">
               <input type="text" class="score-input draft-year-input" data-key="draft|${id}|year" placeholder="20XX">
               <span class="draft-label">Rookie Draft</span>
+              <button class="btn ghost toggle-draft-picks">Draft Picks ▾</button>
               <button class="remove-draft" data-draft-id="${id}">Remove</button>
             </div>
-            ${roundsHtml}
+            <div class="draft-picks">
+              <div class="week-select-row">
+                <label>ROUND</label>
+                <select class="draft-round-select">
+                  <option value="">Select a round</option>
+                  ${roundOptions}
+                </select>
+              </div>
+              <div class="empty-state draft-round-empty"><b>No round selected</b>Choose a round above to view or edit its picks.</div>
+              ${roundsHtml}
+            </div>
           </div>`;
   }
 
@@ -979,7 +984,8 @@ Consequences for owner inactivity or league abandonment.</textarea>
   function buildTradeYearBlock(yid){
     let tradeIds = [];
     try{ tradeIds = JSON.parse(fv(`trade|${yid}|list`, '[]')); }catch(e){ tradeIds = []; }
-    const rows = tradeIds.map(tid=>buildTradeRow(yid, tid)).join('') || '<div class="empty-state" style="padding:16px;"><b style="margin-bottom:0;">No trades logged</b>Click "+ Add Trade" to log one for this year.</div>';
+    const rows = tradeIds.map(tid=>buildTradeRow(yid, tid)).join('');
+    const teamOptions = TEAM_LIST.map(t=>`<option value="${t}">${teamLabel(t)}</option>`).join('');
     return `
           <div class="year-group trade-year-block" data-year-id="${yid}">
             <div class="draft-head">
@@ -987,9 +993,45 @@ Consequences for owner inactivity or league abandonment.</textarea>
               <span class="draft-label">Trades</span>
               <button class="remove-trade-year" data-year-id="${yid}">Remove Year</button>
             </div>
-            <div class="trade-rows" data-year-id="${yid}">${rows}</div>
-            <button class="btn ghost add-trade-btn" data-year-id="${yid}">+ Add Trade</button>
+            <div class="week-select-row">
+              <label>TEAM</label>
+              <select class="trade-year-team-select">
+                <option value="">Select a team</option>
+                ${teamOptions}
+              </select>
+            </div>
+            <div class="empty-state trade-team-empty"><b>No team selected</b>Choose a team above to view or log its trades for this year.</div>
+            <div class="trade-team-body">
+              <div class="trade-rows" data-year-id="${yid}">${rows}</div>
+              <div class="empty-state trade-none-empty" style="display:none; padding:16px;"><b style="margin-bottom:0;">No trades yet</b>Click "+ Add Trade" to log one for this team.</div>
+              <button class="btn ghost add-trade-btn" data-year-id="${yid}">+ Add Trade</button>
+            </div>
           </div>`;
+  }
+
+  function applyTradeYearTeamFilter(yearBlock){
+    if(!yearBlock) return;
+    const sel = yearBlock.querySelector('.trade-year-team-select');
+    const team = sel ? sel.value : '';
+    const body = yearBlock.querySelector('.trade-team-body');
+    const empty = yearBlock.querySelector('.trade-team-empty');
+    if(!team){
+      body.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    body.style.display = 'block';
+    let visibleCount = 0;
+    yearBlock.querySelectorAll('.trade-row').forEach(row=>{
+      const t1 = row.querySelector('[data-key$="|team1"]');
+      const t2 = row.querySelector('[data-key$="|team2"]');
+      const show = (t1 && t1.value === team) || (t2 && t2.value === team);
+      row.style.display = show ? '' : 'none';
+      if(show) visibleCount++;
+    });
+    const noneEmpty = yearBlock.querySelector('.trade-none-empty');
+    if(noneEmpty) noneEmpty.style.display = visibleCount ? 'none' : 'block';
   }
 
   function renderTradeYears(){
@@ -998,7 +1040,7 @@ Consequences for owner inactivity or league abandonment.</textarea>
     container.innerHTML = tradeYearIds.map(buildTradeYearBlock).join('');
     el('tradesYearsEmpty').style.display = tradeYearIds.length ? 'none' : 'block';
     restoreFieldValues(container);
-    applyTradeFilter();
+    container.querySelectorAll('.trade-year-block').forEach(block=> applyTradeYearTeamFilter(block));
   }
 
   el('addSeasonBtn').addEventListener('click', ()=>{
@@ -1031,7 +1073,10 @@ Consequences for owner inactivity or league abandonment.</textarea>
     fieldValues[`trade|${yid}|list`] = '[]';
     if(year) fieldValues[`trade|${yid}|year`] = year;
     yearInput.value = '';
-    renderTradeYears();
+    const container = el('tradesContainer');
+    container.insertAdjacentHTML('beforeend', buildTradeYearBlock(yid));
+    el('tradesYearsEmpty').style.display = 'none';
+    restoreFieldValues(container.lastElementChild);
     scheduleSave();
   });
 
@@ -1060,6 +1105,10 @@ Consequences for owner inactivity or league abandonment.</textarea>
       const panel = t.closest('.season-block').querySelector('.season-schedules');
       const open = panel.classList.toggle('open');
       t.textContent = open ? 'Team Schedules ▴' : 'Team Schedules ▾';
+    }else if(t.classList.contains('toggle-draft-picks')){
+      const panel = t.closest('.draft-block').querySelector('.draft-picks');
+      const open = panel.classList.toggle('open');
+      t.textContent = open ? 'Draft Picks ▴' : 'Draft Picks ▾';
     }else if(t.classList.contains('remove-season')){
       const id = t.dataset.seasonId;
       if(!confirm('Remove this season and everything entered for it? This cannot be undone.')) return;
@@ -1077,13 +1126,19 @@ Consequences for owner inactivity or league abandonment.</textarea>
       scheduleSave();
     }else if(t.classList.contains('add-trade-btn')){
       const yid = t.dataset.yearId;
+      const yearBlock = t.closest('.trade-year-block');
+      const selectedTeam = yearBlock ? yearBlock.querySelector('.trade-year-team-select').value : '';
       let list = [];
       try{ list = JSON.parse(fv(`trade|${yid}|list`, '[]')); }catch(e){ list = []; }
       const tid = 't' + Date.now();
       list.push(tid);
       fieldValues[`trade|${yid}|list`] = JSON.stringify(list);
-      renderTradeYears();
+      if(selectedTeam) fieldValues[`trade|${yid}|${tid}|team1`] = selectedTeam;
       scheduleSave();
+      const rowsContainer = yearBlock.querySelector('.trade-rows');
+      rowsContainer.insertAdjacentHTML('beforeend', buildTradeRow(yid, tid));
+      restoreFieldValues(rowsContainer);
+      applyTradeYearTeamFilter(yearBlock);
     }else if(t.classList.contains('remove-trade')){
       const yid = t.dataset.yearId;
       const tid = t.dataset.tradeId;
@@ -1092,15 +1147,20 @@ Consequences for owner inactivity or league abandonment.</textarea>
       list = list.filter(x=> x !== tid);
       fieldValues[`trade|${yid}|list`] = JSON.stringify(list);
       Object.keys(fieldValues).forEach(k=>{ if(k.startsWith(`trade|${yid}|${tid}|`)) delete fieldValues[k]; });
-      renderTradeYears();
       scheduleSave();
+      const row = t.closest('.trade-row');
+      const yearBlock = t.closest('.trade-year-block');
+      if(row) row.remove();
+      if(yearBlock) applyTradeYearTeamFilter(yearBlock);
     }else if(t.classList.contains('remove-trade-year')){
       const yid = t.dataset.yearId;
       if(!confirm('Remove this year and all trades logged under it? This cannot be undone.')) return;
       tradeYearIds = tradeYearIds.filter(x=> x !== yid);
       Object.keys(fieldValues).forEach(k=>{ if(k.startsWith(`trade|${yid}|`)) delete fieldValues[k]; });
-      renderTradeYears();
       scheduleSave();
+      const block = t.closest('.trade-year-block');
+      if(block) block.remove();
+      el('tradesYearsEmpty').style.display = tradeYearIds.length ? 'none' : 'block';
     }
   });
 
@@ -1123,8 +1183,21 @@ Consequences for owner inactivity or league abandonment.</textarea>
       });
       container.querySelector('.schedule-empty').classList.toggle('hidden', !!team);
     }
+    if(t.classList.contains('draft-round-select')){
+      const container = t.closest('.draft-picks');
+      const round = t.value;
+      container.querySelectorAll('.draft-round').forEach(r=>{
+        r.classList.toggle('active', r.dataset.round === round);
+      });
+      container.querySelector('.draft-round-empty').classList.toggle('hidden', !!round);
+    }
     if(t.classList.contains('trade-team-select')){
-      applyTradeFilter();
+      const yearBlock = t.closest('.trade-year-block');
+      applyTradeYearTeamFilter(yearBlock);
+    }
+    if(t.classList.contains('trade-year-team-select')){
+      const yearBlock = t.closest('.trade-year-block');
+      applyTradeYearTeamFilter(yearBlock);
     }
   });
 
@@ -1253,31 +1326,6 @@ Consequences for owner inactivity or league abandonment.</textarea>
       el('h2hEmpty').style.display = visibleCount === 0 ? 'block' : 'none';
       el('h2hTable').style.display = visibleCount === 0 ? 'none' : 'table';
     });
-  }
-
-  // ---------- Trades team filter (dynamic trade rows) ----------
-  function applyTradeFilter(){
-    const sel = el('tradeTeamSelect');
-    if(!sel) return;
-    const team = sel.value;
-    const yearBlocks = document.querySelectorAll('#tradesContainer .trade-year-block');
-    yearBlocks.forEach(block=>{
-      let blockHasVisible = false;
-      block.querySelectorAll('.trade-row').forEach(row=>{
-        const t1 = row.querySelector('[data-key$="|team1"]');
-        const t2 = row.querySelector('[data-key$="|team2"]');
-        const show = !team || (t1 && t1.value === team) || (t2 && t2.value === team);
-        row.style.display = show ? '' : 'none';
-        if(show) blockHasVisible = true;
-      });
-      block.style.display = blockHasVisible ? '' : 'none';
-    });
-    const anyBlockVisible = Array.from(yearBlocks).some(b=> b.style.display !== 'none');
-    el('tradesEmpty').style.display = (team && tradeYearIds.length && !anyBlockVisible) ? 'block' : 'none';
-  }
-  const tradeSelect = el('tradeTeamSelect');
-  if(tradeSelect){
-    tradeSelect.addEventListener('change', applyTradeFilter);
   }
 
   // ---------- Persisted league id ----------
